@@ -1,11 +1,18 @@
 import React, {FC, useCallback, useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View, Platform} from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Platform,
+  Alert
+} from 'react-native';
 import {useSafeArea} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
 import {StackNavigationProp} from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import Spinner from 'react-native-loading-spinner-overlay';
-import {useExposure} from '@nearform/react-native-exposure-notification-service';
+import {useExposure} from 'react-native-exposure-notification-service';
 
 import Button from '../atoms/button';
 import colors from '../../constants/colors';
@@ -20,6 +27,8 @@ import {
 } from '../../services/api/exposures';
 import {ScreenNames} from '../../navigation';
 import {SingleCodeInput} from '../molecules/single-code-input';
+import {useApplication, UserAgeGroup} from '../../providers/context';
+import {useReminder} from '../../providers/reminder';
 
 type UploadStatus =
   | 'initialising'
@@ -45,6 +54,8 @@ export const TestsAdd: FC<TestsAddProps> = ({navigation}) => {
   const [validationError, setValidationError] = useState<string>('');
   const [uploadToken, setUploadToken] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const {user: {ageGroup} = {}} = useApplication();
+  const {paused} = useReminder();
 
   useEffect(() => {
     const readUploadToken = async () => {
@@ -104,16 +115,35 @@ export const TestsAdd: FC<TestsAddProps> = ({navigation}) => {
     } catch (e) {}
   };
 
+  const handleSubmitCodeConfirmGroup3 = () => {
+    Alert.alert(t('tests:add:confirm:title'), t('tests:add:confirm:text'), [
+      {
+        text: t('common:ok:label'),
+        onPress: () => handleSubmitCode()
+      }
+    ]);
+  };
+
   const handleSubmitCode = async () => {
     let exposureKeys;
     try {
+      if (paused) {
+        await exposure.start();
+      }
+
       exposureKeys = await exposure.getDiagnosisKeys();
       if (exposureKeys === []) {
         cleanUploadToken();
+        if (paused) {
+          await exposure.pause();
+        }
         return navigation.navigate(ScreenNames.testsResult, {dontShare: true});
       }
     } catch (err) {
       cleanUploadToken();
+      if (paused) {
+        await exposure.pause();
+      }
       return navigation.navigate(ScreenNames.testsResult, {dontShare: true});
     }
 
@@ -123,6 +153,9 @@ export const TestsAdd: FC<TestsAddProps> = ({navigation}) => {
       setStatus('success');
       setValidationError('');
       setLoading(false);
+      if (paused) {
+        await exposure.pause();
+      }
       navigation.navigate(ScreenNames.testsResult);
     } catch (err) {
       console.log('error uploading exposure keys:', err);
@@ -143,7 +176,11 @@ export const TestsAdd: FC<TestsAddProps> = ({navigation}) => {
         styles.contentContainer,
         {paddingBottom: insets.bottom + SPACING_BOTTOM}
       ]}>
-      <ModalHeader heading="tests:add:heading" color={colors.darkerGrey} back />
+      <ModalHeader
+        heading="tests:add:heading"
+        color={colors.darkerGrey}
+        input
+      />
       <View style={styles.top}>
         <Spacing s={30} />
         <SingleCodeInput
@@ -152,46 +189,58 @@ export const TestsAdd: FC<TestsAddProps> = ({navigation}) => {
           disabled={status !== 'validate'}
           count={6}
           accessibilityHint={t('tests:add:codeHint')}
-          accessibilityLabel={t('tests:add:codeLabel')}
         />
-        <Spacing s={24} />
         {status === 'uploadOnly' && (
-          <Text style={[styles.center, styles.text]}>
-            {t('tests:add:uploadOnlyDescription')}
-          </Text>
+          <>
+            <Spacing s={24} />
+            <Text style={[styles.center, styles.text]}>
+              {t('tests:add:uploadOnlyDescription')}
+            </Text>
+          </>
         )}
 
         {!!validationError && (
           <>
+            <Spacing s={24} />
             <Text style={[styles.center, baseStyles.error]}>
               {validationError}
             </Text>
-            <Spacing s={24} />
           </>
         )}
-        {status !== 'uploadOnly' &&
+        {status == 'validate' &&
           validationError !== t('tests:code:expiredError') && (
-            <Text style={styles.text}>{t('tests:add:description')}</Text>
+            <>
+              <Spacing s={24} />
+              <Text style={styles.text}>{t('tests:add:description')}</Text>
+            </>
           )}
 
         {validationError === t('tests:code:expiredError') && (
           <>
+            <Spacing s={24} />
             <Text style={styles.centerText}>
               {t('tests:add:assistanceMessage')}
             </Text>
           </>
         )}
+        <Spacing s={32} />
+        {(status === 'upload' || status === 'uploadOnly') && (
+          <Button
+            onPress={
+              ageGroup === UserAgeGroup.ageGroup3 ||
+              ageGroup === UserAgeGroup.ageGroup2
+                ? handleSubmitCodeConfirmGroup3
+                : handleSubmitCode
+            }
+            label={t('tests:add:submitCode')}
+            hint={t('tests:add:submitCodeHint')}
+            type="inverted"
+            style={styles.button}>
+            {t('tests:add:submitCode')}
+          </Button>
+        )}
       </View>
-      {(status === 'upload' || status === 'uploadOnly') && (
-        <Button
-          onPress={handleSubmitCode}
-          label={t('tests:add:submitCode')}
-          hint={t('tests:add:submitCodeHint')}
-          type="inverted"
-          style={styles.button}>
-          {t('tests:add:submitCode')}
-        </Button>
-      )}
+
       {loading && (
         <Spinner animation="fade" visible overlayColor={'rgba(0, 0, 0, 0.5)'} />
       )}
@@ -201,6 +250,7 @@ export const TestsAdd: FC<TestsAddProps> = ({navigation}) => {
 
 const styles = StyleSheet.create({
   center: {
+    ...text.largeBody,
     alignSelf: 'center',
     textAlign: 'center'
   },
@@ -221,7 +271,7 @@ const styles = StyleSheet.create({
     paddingRight: 45
   },
   text: {
-    ...text.medium,
+    ...text.largeBody,
     color: colors.lightBlack
   },
   button: {

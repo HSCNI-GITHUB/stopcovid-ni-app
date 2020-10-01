@@ -2,17 +2,13 @@ import React, {FC} from 'react';
 import {StyleSheet, ScrollView, View, Platform} from 'react-native';
 
 import {useApplication} from '../../providers/context';
-import {Title} from '../atoms/title';
 import {Back} from '../atoms/back';
 import {ModalClose} from '../atoms/modal-close';
-import {useSettings} from '../../providers/settings';
-import Markdown from '../atoms/markdown';
-import Spacing from '../atoms/spacing';
-import {markdownStyles} from './terms';
+
+import {DataPolicyContent} from '../organisms/data-policy-content';
 
 export const DataPolicy: FC = () => {
   const {user} = useApplication();
-  const {dpinText} = useSettings();
 
   return (
     <ScrollView style={styles.container}>
@@ -22,11 +18,7 @@ export const DataPolicy: FC = () => {
           <ModalClose />
         </View>
       )}
-      <Title title="dataPolicy:title" />
-      <View>
-        <Markdown markdownStyles={markdownStyles}>{dpinText}</Markdown>
-      </View>
-      <Spacing s={100} />
+      <DataPolicyContent />
     </ScrollView>
   );
 };

@@ -79,6 +79,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    padding: 12
+    padding: 24
   }
 });

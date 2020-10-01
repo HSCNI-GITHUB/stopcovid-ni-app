@@ -51,7 +51,9 @@ export const Tests: FC<TestsProps> = ({navigation}) => {
       <Image
         source={Logo}
         style={styles.logo}
+        accessible
         accessibilityIgnoresInvertColors={false}
+        accessibilityHint={t('tests:accessibility:illustrationAlt')}
       />
       <Spacing s={68} />
       <Text style={styles.viewText}>{t('tests:content')}</Text>

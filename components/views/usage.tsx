@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import * as SecureStore from 'expo-secure-store';
-import {useExposure} from '@nearform/react-native-exposure-notification-service';
+import {useExposure} from 'react-native-exposure-notification-service';
 
 import Markdown from '../atoms/markdown';
 import {text} from '../../theme';

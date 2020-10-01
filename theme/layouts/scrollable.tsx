@@ -8,12 +8,10 @@ import {
 } from 'react-native';
 import {useSafeArea} from 'react-native-safe-area-context';
 
-import {SPACING_TOP, SPACING_BOTTOM, SPACING_HORIZONTAL} from './shared';
+import {SPACING_BOTTOM} from './shared';
 
 import Spacing from '../../components/atoms/spacing';
 import {Heading} from '../../components/atoms/heading';
-
-import colors from '../../constants/colors';
 
 interface LayoutProps {
   toast?: React.ReactNode;
@@ -53,7 +51,6 @@ export const Scrollable: FC<LayoutProps> = ({
         keyboardShouldPersistTaps="always"
         style={scrollableStyle}
         contentContainerStyle={[
-          styles.scrollView,
           {paddingBottom: (safeArea ? insets.bottom : 0) + SPACING_BOTTOM},
           contentContainerStyle
         ]}
@@ -75,11 +72,6 @@ export const Scrollable: FC<LayoutProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: colors.white
-  },
-  scrollView: {
-    paddingTop: SPACING_TOP,
-    paddingHorizontal: SPACING_HORIZONTAL
+    flex: 1
   }
 });

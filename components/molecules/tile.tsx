@@ -1,19 +1,23 @@
-import React, {FC} from 'react';
+import React, {FC, useEffect, useRef} from 'react';
 import {
   TouchableWithoutFeedback,
   Animated,
   Image,
   Text,
-  StyleSheet
+  StyleSheet,
+  AccessibilityProps,
+  findNodeHandle,
+  AccessibilityInfo,
+  Platform
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 
-import {text} from '../../theme';
+import {text, scale} from '../../theme';
 import colors from '../../constants/colors';
 import {useApplication} from '../../providers/context';
 
-interface Tile {
+interface Tile extends AccessibilityProps {
   label: string;
   hint?: string;
   image: any;
@@ -35,15 +39,37 @@ export const Tile: FC<Tile> = ({
   minHeight = 135,
   link,
   additionalLabel,
-  onboardingCallback
+  onboardingCallback,
+  accessibilityHint
 }) => {
   const {t} = useTranslation();
   const navigation = useNavigation();
-  const {onboarded} = useApplication();
+  const {
+    onboarded,
+    accessibility: {screenReaderEnabled}
+  } = useApplication();
+  const focusStart = useRef<any>();
+
+  useEffect(() => {
+    if (screenReaderEnabled && focusStart.current) {
+      const tag = findNodeHandle(focusStart.current);
+      if (tag) {
+        setTimeout(() => AccessibilityInfo.setAccessibilityFocus(tag), 250);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (link) {
     return (
       <TouchableWithoutFeedback
+        ref={focusStart}
+        accessibilityHint={t(accessibilityHint!)}
+        accessibilityLabel={
+          Platform.OS === 'ios' && accessibilityHint
+            ? t(accessibilityHint!)
+            : undefined
+        }
         onPress={() => {
           if (onboarded) {
             navigation.navigate(link);
@@ -98,11 +124,11 @@ const styles = StyleSheet.create({
   tile: {
     borderRadius: 10,
     justifyContent: 'flex-end',
-    padding: 20,
-    flex: 1
+    padding: 20
   },
   tileLabel: {
     ...text.small,
+    lineHeight: scale(20),
     marginTop: 10
   },
   // @ts-ignore

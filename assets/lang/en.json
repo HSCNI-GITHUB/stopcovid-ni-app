@@ -46,9 +46,14 @@
     },
     "tryAgain": {
       "title": "Please try again",
-      "description": "Sorry, that didn’t work properly.\nPlease check that you have a network connection and try again."
+      "description": "Sorry, that didn’t work properly.\nPlease check that you have a network connection and try again.",
+      "timestampTitle": "Check Date & Time",
+      "timestamp": "We couldn't verify your device. Please check it's set to the correct date and time, and try again."
     },
-    "version": "This is app version {{version}}"
+    "version": "This is app version {{version}}",
+    "today": "today",
+    "tomorrow": "tomorrow",
+    "youtubeEmbedHint": "YouTube video player, double tap to activate"
   },
   "links": {
     "appstore": "https://apps.apple.com/us/app/id1519404160",
@@ -59,27 +64,30 @@
     "d": "https://covid-19.hscni.net/news/self-isolation-guide/",
     "e": "https://covid-19.hscni.net/symptoms/",
     "f": "https://covid-19.hscni.net/contact-tracing/",
-    "g": "https://apps.apple.com/gb/app/apple-store/id375380948",
-    "h": "https://www.nhs.uk/conditions/coronavirus-covid-19/testing-and-tracing/ask-for-a-test-to-check-if-you-have-coronavirus",
+    "g": "https://www.childrenscommissioner.gov.uk/coronavirus/",
+    "h": "https://www.nhs.uk/conditions/coronavirus-covid-19/testing-and-tracing/get-an-antigen-test-to-check-if-you-have-coronavirus/",
     "i": "https://covid-19.hscni.net/guidance/what-should-i-do-if-i-get-a-positive-test-result/",
     "j": "https://covid-19.hscni.net/news/self-isolation-guide/",
     "k": "https://covid-19.hscni.net/guidance/what-if-i-do-not-agree-with-advice/",
-    "l": "https://covid-19.hscni.net/stop-covid-ni-mobile-app/"
+    "l": "https://covid-19.hscni.net/stop-covid-ni-mobile-app/",
+    "x": "ZIWBm40ruIA"
   },
   "modals": {
     "exposureNotifications": {
       "title": "‘Exposure Notifications’ are required",
       "instructionsios": "1. Please ensure ‘COVID-19 Exposure Notifications’ are switched on for this device\n2. Re-open this app",
       "instructionsandroid": "1. Go to device ‘Settings’\n2. Select ‘Google > COVID-19 Exposure Notifications’\n3. Switch on ‘Exposure Notifications’\n4. Re-open this app",
-      "turnOn": "Please ensure ‘COVID-19 Exposure Notifications’ are switched on for this device",
+      "turnOn": "1. Please allow ‘COVID-19 Exposure Notifications’ for this device",
       "turnOnBtnHint": "Turn on COVID-19 Exposure Notifications",
-      "turnOnBtnLabel": "Turn on"
+      "turnOnBtnLabel": "Allow notifications",
+      "goToSettingsHint": "Go to device settings",
+      "goToSettings": "Go to device settings"
     },
     "bluetoothNotifications": {
       "title": "Bluetooth is required",
       "instructions": "1. Go to device ‘Settings’\n2. Select ‘Bluetooth’\n3. Switch on ‘Bluetooth’\n4. Re-open this app",
-      "btnHint": "Go to device ‘Settings’",
-      "btnLabel": "Go to device ‘Settings’"
+      "btnHint": "Go to device settings",
+      "btnLabel": "Go to device settings"
     },
     "sendNotifications": {
       "title": "‘App Notifications’ are required",
@@ -102,34 +110,72 @@
     }
   },
   "ageRequirement": {
-    "notice": "You must be 18 or older to use this app",
-    "over": "I am 18 or older",
-    "under": "I am under 18",
-    "accessibility": {
-      "overHint": "I am 18 or older",
-      "overLabel": "I am 18 or older",
-      "underHint": "I am under 18",
-      "underLabel": "I am under 18"
+    "notice": "What age are you?",
+    "button": {
+      "ageGroup1": {
+        "label": "I am 16 or older",
+        "hint": "Confirms you are 16 or older"
+      },
+      "ageGroup2": {
+        "label": "I am 13 - 15",
+        "hint": "Confirms you are 13 to 15 years old"
+      },
+      "ageGroup3": {
+        "label": "I am 11 - 12",
+        "hint": "Confirms you are 11 to 12 years old"
+      },
+      "under": {
+        "label": "I am under 11",
+        "hint": "Confirms you are under 11"
+      }
     },
     "underAlert": {
-      "title": "You must be 18 or older to use this app",
-      "body": "If you are under 18, please remove this app from your device",
+      "title": "You must be 11 or older to use this app",
+      "body": "If you are under 11, please remove this app from your phone.",
       "action": "OK"
     }
   },
+  "ageSorting": {
+    "illustrationHint": {
+      "ageGroup2": "Illustration of an warning sign showing a question mark",
+      "ageGroup3": "Illustration of a warning sign showing an exclamation mark"
+    },
+    "notice": {
+      "ageGroup2": "Ask a parent or guardian to help you if you have questions about using this app.",
+      "ageGroup3": "You may need help from your parent, guardian or trusted adult for this next bit."
+    },
+    "description": {
+      "ageGroup2": "It’s also important to tell them if you have been in contact with someone who has COVID-19.",
+      "ageGroup3": "To protect your privacy and rights you should get their permission to use the app"
+    },
+    "nextLabel": {
+      "default": "Continue"
+    },
+    "backLabel": {
+      "default": "Back"
+    }
+  },
   "locationConfirmation": {
+    "illustrationHint": "Illustration of a map with a location pin on Northern Ireland",
     "notice": "Only people living in Northern Ireland can use this app.",
     "description": "To be able to put a COVID-19 test result into the app, you must be linked to the NI lab test result registry.",
-    "question": "Are you from NI?",
+    "question": "Do you live in NI?",
     "noAlert": {
-      "title": "Only people living in Northern Ireland can use this app.",
-      "body": "You are advised not to try to use this app, and are encouraged to use an app that will work for you, in your area.",
+      "title": {
+        "ios": "Only people living in Northern Ireland can use this app.",
+        "android": "Only people living in NI can use this app."
+      },
+      "body": "You should not try to use this app. Instead use an app that will work for you, in your area.",
       "action": "OK"
     }
   },
   "viewNames": {
     "age": "Please confirm your age",
     "location": "Please confirm your location",
+    "ageSorting": {
+      "ageGroup2": "Age Sorting for age group 13 - 15",
+      "ageGroup3": "Age Sorting for age group 11 - 12"
+    },
     "onboarding": "Onboarding",
     "dashboard": "Dashboard",
     "tracing": "Tracing",
@@ -144,59 +190,127 @@
     "testsAdd": "Add test result",
     "testsResult": "Test result verified",
     "dataPolicy": "Data Privacy Information",
-    "debug": "Debug"
+    "debug": "Debug",
+    "pause": "Pause Tracing",
+    "yourDataModal": "How does the app work?",
+    "testResultModal": "How do I add my result?",
+    "privacyModal": "More about privacy"
   },
   "onboarding": {
     "whyUse": {
       "view": {
-        "title": "Why use this contact tracing app?",
+        "title": "You are helping others",
         "main": "Using it will help all of us in NI by stopping or slowing the spread of COVID-19. This supports the health services, and helps us avoid another lockdown.",
-        "text": "By using this app you are really helping to save lives. **Thank you.**",
+        "text": "**Using this app will slow the spread of COVID-19.** This supports the health services, and helps us avoid lockdowns. You are helping to save lives. **Thank you.**",
         "nextHint": "Navigate to the next screen",
         "nextLabel": "Next"
       },
       "accessibility": {
         "nextHint": "Navigate to the next screen",
-        "nextLabel": "Next"
+        "nextLabel": "Next",
+        "illustrationAlt": "Illustration of people using this app."
       }
     },
     "yourData": {
       "view": {
-        "title": "How does this app work?",
-        "textBell": "**If you are in close contact** with an app user who has added a positive COVID-19 test result to their app, this app will notify you. **You won’t know who, when or where.**",
-        "textUnion": "**If you test positive for COVID-19** you can add that result to this app. This will notify other app users that you have been in close contact with. **This app will never reveal your identity or location.**"
+        "title": "Be the first to know",
+        "text": "**If you are in close contact** with an app user who has told their app that they have COVID-19, you will get an alert. **You won’t know who, when or where.**"
+      },
+      "modal": {
+        "content": "**It uses Bluetooth to check if your phone is near others with the app.** It doesn’t use GPS to track your location. This protects everyone’s privacy and only uses a very small amount of battery.\n\n**If you get an alert** to say you have been in close contact with someone, **this is how it will pop up on your screen:**"
       },
       "accessibility": {
         "nextHint": "Navigate to the next screen",
-        "nextLabel": "Next"
+        "nextLabel": "Next",
+        "howWorksHint": "Learn How does the app work.",
+        "howWorksLabel": "How does the app work?",
+        "illustrationAlt": "Illustration of a phone showing the words ‘Close Contact Alert’ on the screen.",
+        "modalIllustrationAlt": "Illustration of two hands holding phones that show the bluetooth symbol",
+        "notificationIllustrationAlt": "Illustration of example notification on phone showing that you have been in close contact with a person who has COVID-19."
+      }
+    },
+    "testResult": {
+      "view": {
+        "title": "Getting a test result",
+        "text": "**If you test positive for COVID-19** you can tell the app by putting in a code we send you by text. If you agree, the app will release the ‘Random IDs’ your phone has been swapping over the last 14 days. Other app users that you’ve been close to will then be alerted.\n\n**They won’t know who, when or where.**"
+      },
+      "modal": {
+        "content": "If you test positive for COVID-19 you will get a test code by SMS text message from **'HSCresult'** like this:",
+        "content1": "When you put your test code into this app you will be asked to share the 'Random IDs’ that your phone has been swapping with other app users over the last 14 days. This will allow us to tell those people that they have been exposed to COVID-19.\n\n**We will never ask you to reply to the SMS text message. **Please ignore any message if it asks you to reply or send information.",
+        "content2": "So that you can use this app when travelling abroad we will securely share Random IDs with other countries. This also means that apps used by visitors from those countries will work here.",
+        "link": "How do I avoid scams?",
+        "linkHint": "More about avoiding scams",
+        "linkAddress": "https://www.nidirect.gov.uk/articles/scams"
+      },
+      "accessibility": {
+        "nextHint": "Navigate to the next screen",
+        "nextLabel": "Next",
+        "howToAddResultHint": "Learn How you can add your result.",
+        "howToAddResultLabel": "How do I add my result?",
+        "illustrationAlt": "Illustration of a medic with a clipboard standing by a car and speaking to the driver.",
+        "modalIllustrationAlt": "Speech bubble icon with HSC logo inside",
+        "messageIllustrationAlt": "Illustration of example message on phone showing that you tested positive for COVID-19."
       }
     },
     "privacy": {
       "view": {
-        "title": "How is my privacy protected?",
-        "usage": "The app can also collect data on how people use it, to help us make it better. If you’re OK with this please turn on Share Usage Data.",
-        "textKey": "If you test positive for COVID-19 you will get a code by SMS text message from **'HSCresult'**. When you put that code into this app you will be asked to share the random IDs that your phone has been swapping with other app users over the last 14 days. If you agree, these 'diagnosis keys' will allow us to tell those people that they have been exposed to COVID-19.\n\n # \n\n**We will never ask you to reply to the SMS text message.** Please ignore any message asking you to reply or send information.",
-        "textKey1": "So that you can use this app when travelling abroad we will securely share 'diagnosis keys' with other countries. This also means that apps used by visitors from those countries will work here.",
-        "textEye": "**This app will never track your identity or location**, but it does collect some data. We will know the number of app users, the number of people in NI who enter ‘HSCresult’ codes, and the number of people in NI who are told that they have been exposed to COVID-19.\n\n # \n\n**We need this data to prove that the app works,** and to get it approved as a medical device.",
-        "link": "Avoiding scams",
-        "linkHint": "More about avoiding scams"
+        "title": "__Nobody else__ will know",
+        "titleA11y": "Nobody else will know",
+        "text": "This app never knows your name or where you are, so it’s completely private. It runs in the background on Bluetooth, not GPS, and **uses very little battery**.\n\nOnly general information is collected such as the number of app users, the number of people who add their test result, and the number of people who get alerted.\n\nWe need this to prove the app works, and make it a medical device."
+      },
+      "modal": {
+        "content": "**This app never knows your name or location.** It only collects general information such as the number of app users, the number of people who add their test result, and the number of people who get a close contact alert.\n\n**We need this information to prove the app works,** and make it a medical device.",
+        "content1": "To protect your privacy, and tell you as soon as possible if you’ve been near someone with COVID-19, we use **automated processing.** This means that computers, not people, make some decisions, including whether or not you get a close contact alert. Some people are unhappy with this. To be able to use this app you will be asked to allow 'exposure notifications'. By doing this you are agreeing to the automated processing.",
+        "link": "Read the full privacy notice",
+        "linkHint": "More about the privacy notice"
+      },
+      "accessibility": {
+        "nextHint": "Navigate to the next screen",
+        "nextLabel": "Next",
+        "moreHint": "Learn More about privacy.",
+        "moreLabel": "More about privacy",
+        "illustrationAlt": "Illustration of a person using a phone, beside icons which indicate that no identity or location tracking is happening.",
+        "modalIllustration1Alt": "Illustration of a ‘No location tracking’ sign",
+        "modalIllustration2Alt": "Illustration of a locked padlock"
+      }
+    },
+    "termsNotice": {
+      "view": {
+        "title": "This app uses automated processing",
+        "content": "Meaning computers, not people, make some decisions, including whether or not you get a close contact alert. Some people are unhappy with this.",
+        "readMore": "Read more about this",
+        "readMoreHint": "Opens an external link",
+        "agreement": {
+          "content": "**Do you agree to receiving automated instructions to 'self isolate' from this app?**",
+          "yes": {
+            "buttonLabel": "Yes, I agree",
+            "buttonHint": "Agree to continue and start using this app"
+          }
+        }
+      },
+      "confirm": {
+        "title": "Are you sure?",
+        "description": "If you do not agree to automated processing you will not be able to use the app."
       }
     },
     "agreement": {
       "view": {
-        "title": "Are you happy to continue?",
-        "textBell": "To protect your privacy, and tell you as soon as possible if you’ve been exposed to COVID-19, we use **automated processing**. This means that no human is involved in the process, and some people are uncomfotable with that. To be able to use this app you will be asked to turn on 'exposure notifications'. By doing this you are agreeing to the automated processing.",
-        "confirmation": "Do you agree to continue and start using this app?",
-        "tc": "If you tap ‘Yes’ you are accepting the Terms and Conditions.",
-        "tcLink": "Read T&C’s here",
-        "tcLinkHint": "View the terms and conditions",
-        "optOut": "**You can choose to opt out at any time.** To do this select ‘Leave’ in ‘Settings’ in this app."
+        "textBell": "So that you can use this app when travelling abroad we will securely share Random IDs with other countries. This also means that apps used by visitors from those countries will work here.",
+        "title": {
+          "default": "Are you happy to start using this app?",
+          "ageGroup3": "Having spoken to your parent, guardian or trusted adult, are you happy to use this app?"
+        },
+        "titleA11y": "Data privacy information Notice",
+        "tc": "If you tap ‘Yes’ you are accepting the Terms & Conditions.",
+        "tcLink": "Read Terms & Conditions",
+        "tcLinkHint": "Navigates to Terms & Conditions",
+        "optOut": "**You can opt out at any time.** To do this select ‘Leave’ in ‘Settings’ in this app."
       },
       "accessibility": {
         "yesHint": "Agree to continue and start using this app",
-        "yesLabel": "Agree",
+        "yesLabel": "Yes",
         "noHint": "Disagree to continue",
-        "noLabel": "Disagree"
+        "noLabel": "No"
       },
       "confirm": {
         "title": "Are you sure?",
@@ -208,12 +322,12 @@
       "ios": {
         "title": "Please update Apple iOS to use this app",
         "text1": "You need to do this to use the ‘Exposure Notification Service’ created by Apple to help make apps like this work and stop COVID-19.",
-        "btnLabel": "Update iOS now"
+        "btnLabel": "Next"
       },
       "android": {
         "title": "Please update Google Play Services to use this app",
         "text1": "You need to do this to use the ‘Exposure Notification Service’ created by Google to help make apps like this work and stop COVID-19.",
-        "btnLabel": "Update now"
+        "btnLabel": "Next"
       },
       "accessibility": {
         "ios": {
@@ -226,21 +340,25 @@
     },
     "permissionsInfo": {
       "view": {
-        "title": "Last few steps...",
-        "item1": "Next, you will be asked for your permission to enable contact tracing technologies and notifications for this app.",
+        "title": "Setting up your phone",
+        "item1": "Next, you will be asked for your permission to enable contact tracing technologies and notifications for this app. Make sure Bluetooth is on.",
         "item2": "Please give your permission so that the app can work properly."
       },
-      "accesssibility": {
+      "accessibility": {
         "nextHint": "Navigate to the next screen",
-        "nextLabel": "Next"
+        "nextLabel": "Next",
+        "illustrationAlt": "Illustration of a hand holding a mobile phone, showing a Bluetooth symbol and an exclamation mark inside a speech bubble."
       }
     }
   },
   "dashboard": {
+    "title": "Home Screen",
     "message": {
       "standard": "You can close this app and it will keep working",
       "bluetooth": "Please keep Bluetooth on",
-      "inactive": "Tracing is not active, so this app won’t work"
+      "inactive": "Tracing is not active, so this app won’t work",
+      "paused": "Tracing is not active, so this app won’t work",
+      "pausedSupplemental": "Tracing paused"
     },
     "exposed": "You must **self-isolate**",
     "isolationComplete": "Your isolation period is complete.",
@@ -252,6 +370,12 @@
       "Go here to find out more about how the app works",
       "Tested positive? Add your result and help protect others"
     ],
+    "tourButtons": {
+      "screen0": "Home Tour - Tracing",
+      "screen1": "Home Tour - Share and protect",
+      "screen2": "Home Tour - About this app",
+      "screen3": "Home Tour - Add test result"
+    },
     "tourAction": "Next",
     "alternateTourStart": "Tracing is **not active** at the moment but you can fix this later",
     "tracing": {
@@ -259,7 +383,9 @@
       "active": "Active",
       "inactive": "Not active",
       "contact": "Tracing",
-      "contactHint": "Close Contact Alert"
+      "contactHint": "Close Contact Alert",
+      "paused": "Tracing",
+      "pausedHint": "Paused"
     },
     "community": {
       "label": "Share and Protect"
@@ -276,35 +402,86 @@
   },
   "tracing": {
     "heading": "Tracing",
-    "body": "If you are in close contact with an app user who has tested positive for COVID-19 and added that result to their app, this app will notify you.",
+    "body": "If you are in close contact with an app user who has told their app that they have COVID-19, you will get an alert. You won’t know who, when or where.",
     "status": {
       "heading": "Tracing Status",
       "active": "Active",
       "inactive": "Not Active"
     },
-    "message": "You can close this app and tracing will keep working. If you want to stop tracing and opt out select ‘Leave’ from the ‘Settings’ menu.",
+    "message": "You can close this app and tracing will keep working. If you want to stop tracing and opt out select ‘Leave’ from the ‘Settings’ menu in this app.",
     "inactiveMessage": "Tracing is not active, so this app won’t work. To fix this go to your device ‘Settings’ and **turn on**:",
     "turnOn1": "Bluetooth",
     "turnOn2": "‘COVID-19 Exposure Notifications’",
     "inactiveMessage1": "If you want to stop tracing and opt out select ‘Leave’ from the ‘Settings’ menu in this app.",
     "notificationTitle": "Action required",
-    "notificationBody": "You have been in **close contact with someone who has COVID-19**"
+    "notificationBody": "You have been in **close contact with someone who has COVID-19**",
+    "buttonLabel": "I want to pause Tracing",
+    "paused": {
+      "heading": "Tracing Paused, reminder set for {{time}}",
+      "title": "Paused",
+      "reminder": "Reminder at",
+      "text": "Tracing is not active, so this app is not exchanging any data with other users’ apps.",
+      "buttonLabel": "Restart Tracing",
+      "buttonHint": "Restarts contact tracing after being paused"
+    },
+    "accessibility": {
+      "illustrationAlt": "Illustration of a man and woman standing beside each other while both using this app"
+    }
   },
   "community": {
     "heading": "Share & Protect",
     "body": "Contact tracing is more effective when more people use this app. Invite others to download the app and help protect our community.",
     "figures": "Downloads of this app",
-    "registrationsHint": "Downloads of this app"
+    "registrationsHint": "Downloads of this app",
+    "accessibility": {
+      "illustrationAlt": "Illustration of customers and a shop assistant at a supermarket till, all using this app."
+    }
   },
   "about": {
     "heading": "About this App",
     "subheading": "How does this app work?",
+    "intro": "**If you are in close contact** with an app user who has told their app that they have COVID-19, you will get an alert. **You won’t know who, when or where.**\n\n**It uses Bluetooth to check if your phone is near others with the app.** It doesn’t use GPS to track your location. This protects everyone’s privacy and only uses a very small amount of battery.\n\n**If you get an alert** to say you have been in close contact with someone, **this is how it will pop up on your screen:**",
+    "notificationAlt": "Image of a phone notification from the StopCOVID NI app reading: IMPORTANT: Close Contact Alert. You have been in close contact with someone who has COVID-19. Tap here to open the app and find out what to do.",
     "link": "Read more about this app and the technology used",
-    "linkAdddress": "https://www.google.com"
+    "message": {
+      "title": "Getting a test result",
+      "intro": "**If you test positive for COVID-19 you can tell this app.** Other app users that you’ve been close to will then be alerted.\n\nYou will get a test code by SMS text message from **'HSCresult'** like this:",
+      "messageIllustrationAlt": "Speech bubble icon with HSC logo inside",
+      "messageAlt": {
+        "ios": "Image of an SMS text message Notification from HSC Result reading: Your 03 Aug COVID-19 test result is POSITIVE. Please self-isolate. If using the ‘StopCOVID NI’ app add test code 1A2B3C (expires in 24 h)",
+        "android": "Image of an SMS text message Notification from HSC Result reading: Your 03 Aug COVID-19 test result is POSITIVE. Please self-isolate. If using the ‘StopCOVID NI’ app add test code ****** (expires in 24 h)"
+      },
+      "content": "When you put your test code into this app you will be asked to share the 'Random IDs’ that your phone has been swapping with other app users over the last 14 days. This will allow us to tell those people that they have been exposed to COVID-19.\n\n**We will never ask you to reply to the SMS text message. **Please ignore any message if it asks you to reply or send information.",
+      "abroad": "So that you can use this app when travelling abroad we will securely share Random IDs with other countries. This also means that apps used by visitors from those countries will work here."
+    },
+    "privacy": {
+      "title": "How is my privacy protected?",
+      "section1": "If you tell the app you have COVID-19, nobody else will know. **This app never knows your name or where you are, so it’s completely private.**",
+      "section2": "**This app never knows your name or location.** It only collects general information such as the number of app users, the number of people who add their test result, and the number of people who get a close contact alert.\n\n**We need this information to prove the app works,** and make it a medical device.",
+      "section3": "To protect your privacy, and tell you as soon as possible if you’ve been near someone with COVID-19, we use **automated processing**. This means that computers, not people, make some decisions, including whether or not you get a close contact alert. Some people are unhappy with this. To be able to use this app you have allowed 'exposure notifications'. By doing this you are agreeing to the automated processing.",
+      "pinAlt": "Illustration of a ‘No location tracking’ sign",
+      "lockAlt": "Illustration of a locked padlock",
+      "readMore": "Read more about this",
+      "link": "How do I avoid scams?",
+      "linkHint": "More about avoiding scams",
+      "linkAddress": "https://www.nidirect.gov.uk/articles/scams"
+    },
+    "whyUse": {
+      "title": "Why use this contact tracing app?",
+      "content": "**Using this app will slow the spread of COVID-19.** This supports the health services, and helps us avoid lockdowns. You are helping to save lives. **Thank you.**"
+    }
   },
   "closeContactNotification": {
-    "title": "IMPORTANT: Close Contact Alert",
-    "description": "You have been in close contact with someone who has COVID-19. Tap here to open the app and find out what to do."
+    "title": {
+      "default": "IMPORTANT: Close Contact Alert",
+      "ageGroup2": "IMPORTANT: Close Contact Alert 👀",
+      "ageGroup3": "IMPORTANT: Show this to an adult 👀"
+    },
+    "description": {
+      "default": "You have been in close contact with someone who has COVID-19. Tap here to open the app and find out what to do.",
+      "ageGroup2": "You have been in close contact with someone who has COVID-19. Tell your parent/guardian. Then tap here to find out what to do.",
+      "ageGroup3": "You have been in close contact with someone who has COVID-19. Tell your parent/guardian. Then tap here to find out what to do."
+    }
   },
   "prompts": {
     "enableExposure": {
@@ -318,20 +495,58 @@
   },
   "closeContact": {
     "title": "Action Required",
-    "warning": "You must self-isolate for 14 days",
-    "body1": "This is because you have been in close contact with someone who has COVID-19 and could be infected.",
-    "body2": "By self-isolating you will protect others and help prevent another lockdown. Thank you for doing this.",
-    "link1": "What is close contact?",
-    "link1Hint": "What is close contact?",
-    "link2": "How do I self-isolate?",
-    "link2Hint": "How do I self-isolate?",
-    "link3": "I disagree with this advice",
-    "link3Hint": "I disagree with this advice",
-    "notWell": "**Not feeling well?**\n\nCheck your symptoms and book a test"
+    "warning": {
+      "default": "Speak to your parent or guardian",
+      "ageGroup1": "You must self-isolate for 14 days"
+    },
+    "body1": {
+      "default": "You have been in close contact with someone who has COVID-19 and could be infected.\n\n # \n\n**You must self-isolate for 14 days.**",
+      "ageGroup1": "You have been in close contact with someone who has COVID-19 and could be infected."
+    },
+    "nextSteps": {
+      "intro": {
+        "default": "#What are the next steps?\n\n ## \n\nFirst, you need to show this message to your parent or guardian. They will help you take the following actions:",
+        "ageGroup1": "#What are the next steps?"
+      },
+      "step1": {
+        "text": {
+          "ageGroup1": "##Self-isolate for 14 days\n\nThis will protect others and help prevent another lockdown.",
+          "default": "##Self-isolate for 14 days\n\nThis will protect others. You should stay off school for two weeks."
+        },
+        "link": "Read our guide"
+      },
+      "step2": {
+        "text": "##Check your symptoms\n\nCheck your symptoms, even mild ones, and monitor your progress.",
+        "link": "Check symptoms"
+      },
+      "step3": {
+        "text": "##Book a test\n\nIf you have COVID-19 symptoms, or have been advised to,",
+        "link": "Book a test"
+      },
+      "step4": {
+        "text": "##Stay in one room if you can\n\nTry to avoid contact with other people in your house."
+      },
+      "step5": {
+        "text": {
+          "ageGroup1": "##Call if you need help\n\nRing the Community Helpline on 0808 802 0020.",
+          "default": "##Call if you need help\n\nWith your parent or guardian call 0808 802 0020."
+        }
+      }
+    },
+    "moreInfo": "More Information",
+    "updated": "Updated: 30th September 2020",
+    "link1": "About COVID symptoms",
+    "link1Hint": "About COVID symptoms",
+    "link2": "What is close contact?",
+    "link2Hint": "What is close contact?",
+    "link3": "Self-isolation for children",
+    "link3Hint": "Self-isolation for children",
+    "link4": "I disagree with this advice",
+    "link4Hint": "I disagree with this advice"
   },
   "tests": {
     "heading": "Add Test Result",
-    "content": "If you test positive for COVID-19 you can add that result to this app and alert others. This will never reveal your identity or location.",
+    "content": "If you test positive for COVID-19 you can add that result to this app and alert others. This will never reveal who you are or where you are.",
     "bookTest": "Book a Test",
     "bookTestHint": "Book a Test",
     "addTestResult": "Add Test Result Code",
@@ -339,6 +554,9 @@
     "modalContent": "App users you have been in close contact with will be told that they have been exposed to someone with COVID-19 but won’t know who it was",
     "permissionError": "We have not uploaded your keys as you did not grant permission.",
     "uploadError": "An error occurred trying to upload",
+    "accessibility": {
+      "illustrationAlt": "Illustration of a medic with a clipboard standing by a car and speaking to the driver."
+    },
     "code": {
       "expiredError": "Expired code",
       "invalidError": "Invalid code",
@@ -346,13 +564,16 @@
     },
     "add": {
       "codeHint": "Insert test result code",
-      "codeLabel": "Test result code input",
-      "assistanceMessage": "You will be contacted by the Public Health Authority Contact Tracing team. Please tell them that you have been using this app, and that your code expired.",
+      "assistanceMessage": "You will be contacted by the Public Health Agency Contact Tracing team. Please tell them that you have been using this app, and that your code expired.",
       "heading": "Add Test Result Code",
-      "description": "You should only enter a Test Result Code if you have tested positive for COVID-19",
-      "submitCode": "Submit code",
-      "submitCodeHint": "Submit code",
-      "uploadOnlyDescription": "Test result code was already added.\nYou just need to submit it."
+      "description": "You should only enter a Test Result Code if you have tested positive for COVID-19.",
+      "submitCode": "Submit",
+      "submitCodeHint": "Button to Submit your code.",
+      "uploadOnlyDescription": "Test result code was already added.\nYou just need to submit it.",
+      "confirm": {
+        "title": "You might need help",
+        "text": "This bit is really important to let others know they might be infected. Ask a trusted adult for help if you are not sure about anything."
+      }
     },
     "result": {
       "heading": "Thank you.",
@@ -389,7 +610,7 @@
       "hint": "View the data usage settings"
     },
     "leave": {
-      "label": "Leave",
+      "label": "**Leave** (opt out of Tracing)",
       "hint": "Leave the application"
     },
     "debug": {
@@ -442,5 +663,16 @@
   },
   "dataPolicy": {
     "title": "Data Privacy Information Notice"
+  },
+  "pause": {
+    "title": "Pause Tracing",
+    "body": "When you are wearing personal protective equipment (PPE) or protected behind a screen you should pause tracing.",
+    "label": "Send me a reminder to restart tracing at:",
+    "button": "Pause Tracing now",
+    "modalHeader": "Pick a time"
+  },
+  "reminder": {
+    "title": "REMINDER: Restart Tracing",
+    "message": "Tap here to open the app. Then tap `Restart Tracing` to activate contact tracing"
   }
 }

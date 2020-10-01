@@ -1,7 +1,7 @@
 import React, {FC} from 'react';
 import {StyleSheet, View, Text} from 'react-native';
 import {Path, Defs, LinearGradient, Stop, Circle} from 'react-native-svg';
-import {AreaChart, YAxis, Grid} from 'react-native-svg-charts';
+import {AreaChart, Grid} from 'react-native-svg-charts';
 import {differenceInDays, format} from 'date-fns';
 import * as shape from 'd3-shape';
 
@@ -20,20 +20,6 @@ interface TrackerAreaChartProps {
   gradientStart?: string;
   gradientEnd?: string;
   lineColor?: string;
-}
-
-function formatLabel(value: number) {
-  if (value > 1000000) {
-    const millions = parseFloat((value / 1000000).toFixed(1));
-    return `${millions}m`;
-  }
-
-  if (value > 1000) {
-    const thousands = parseFloat((value / 1000).toFixed(1));
-    return `${thousands}k`;
-  }
-
-  return value;
 }
 
 export const TrackerAreaChart: FC<TrackerAreaChartProps> = ({
@@ -112,14 +98,6 @@ export const TrackerAreaChart: FC<TrackerAreaChartProps> = ({
         accessible
         accessibilityHint={hint}
         accessibilityLabel={labelString}>
-        <YAxis
-          style={styles.yAxis}
-          data={chartData}
-          numberOfTicks={3}
-          contentInset={{top: 30, bottom: 4}}
-          svg={{fontSize: 12, fill: colors.white}}
-          formatLabel={formatLabel}
-        />
         <View style={styles.chartingCol}>
           <AreaChart
             style={styles.chart}
@@ -156,6 +134,10 @@ export const TrackerAreaChart: FC<TrackerAreaChartProps> = ({
               const month = format(new Date(date), 'MMM');
               const prevMonth = prevDate && format(new Date(prevDate), 'MMM');
 
+              if (month === prevMonth) {
+                return;
+              }
+
               const monthText =
                 prevMonth !== month || index === axisData.length - 1
                   ? `\n${month}`
@@ -169,7 +151,7 @@ export const TrackerAreaChart: FC<TrackerAreaChartProps> = ({
                     index === 0 && styles.leftAlign,
                     index === axisData.length - 1 && styles.rightAlign
                   ]}>
-                  {`${date.getDate()}${monthText}`}
+                  {`${monthText}`}
                 </Text>
               );
             })}
@@ -194,7 +176,8 @@ const styles = StyleSheet.create({
   yAxis: {
     height: 144,
     width: 30,
-    marginLeft: -10
+    marginLeft: -30,
+    right: -20
   },
   chartingCol: {
     flex: 1,
@@ -206,7 +189,6 @@ const styles = StyleSheet.create({
   },
   xAxis: {
     height: 36,
-    paddingTop: 4,
     paddingRight: 9,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -214,6 +196,7 @@ const styles = StyleSheet.create({
   },
   date: {
     ...text.small,
+    lineHeight: 15,
     fontSize: 10,
     textAlign: 'center',
     textTransform: 'uppercase'

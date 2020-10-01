@@ -1,12 +1,11 @@
 import {Platform} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-// This App uses SSL Pinning, to enable uncomment and add the certs to be pinned
 // import {fetch} from 'react-native-ssl-pinning';
 import NetInfo from '@react-native-community/netinfo';
 import RNGoogleSafetyNet from 'react-native-google-safetynet';
 import RNIOS11DeviceCheck from 'react-native-ios11-devicecheck';
-import {SAFETYNET_KEY, BUILD_VERSION, ENV, TEST_TOKEN} from '@env';
-
+import {SAFETYNET_KEY, ENV, TEST_TOKEN} from '@env';
+import {getVersion} from 'react-native-exposure-notification-service';
 import {isMountedRef, navigationRef, ScreenNames} from '../../navigation';
 import {urls} from '../../constants/urls';
 
@@ -26,9 +25,11 @@ export const verify = async (nonce: string) => {
         deviceVerificationPayload: TEST_TOKEN
       };
     }
+    const deviceVerificationPayload = await RNIOS11DeviceCheck.getToken();
+
     return {
       platform: 'ios',
-      deviceVerificationPayload: await RNIOS11DeviceCheck.getToken()
+      deviceVerificationPayload
     };
   }
 };
@@ -68,10 +69,10 @@ export const request = async (url: string, cfg: any) => {
   let resp;
   try {
     resp = await fetch(url, {
-      ...config,
-      // timeoutInterval: 30000,
-      // sslPinning: {
-      //   certs: ['cert1']
+      ...config//,
+      //timeoutInterval: 30000,
+      //sslPinning: {
+      //  certs: ['cert1', 'cert2', 'cert3', 'cert4', 'cert5']
       // }
     });
     isUnauthorised = resp && resp.status === 401;
@@ -90,11 +91,11 @@ export const request = async (url: string, cfg: any) => {
     };
 
     return fetch(url, {
-      ...newConfig,
-      // timeoutInterval: 30000,
-      // sslPinning: {
-      //   certs: ['cert1']
-      // }
+      ...newConfig//,
+      //timeoutInterval: 30000,
+      //sslPinning: {
+      // certs: ['cert1', 'cert2', 'cert3', 'cert4', 'cert5']
+      //}
     });
   }
 
@@ -159,13 +160,20 @@ export async function register(): Promise<{
   }
   const {nonce} = await registerResponse.json();
 
+  const body = JSON.stringify({
+    nonce,
+    timestamp: Date.now(),
+    ...(await verify(nonce))
+  });
+
   const verifyResponse = await request(`${urls.api}/register`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({nonce, ...(await verify(nonce))})
+    body
   });
+
   if (!verifyResponse) {
     throw new Error('Invalid response');
   }
@@ -205,8 +213,9 @@ export async function saveMetric({event = ''}) {
     if (!analyticsOptin || (analyticsOptin && analyticsOptin !== 'true')) {
       return false;
     }
+    // @ts-ignore
+    const version = await getVersion().display;
     const os = Platform.OS;
-    const version = BUILD_VERSION;
     const req = await request(`${urls.api}/metrics`, {
       authorizationHeaders: true,
       method: 'POST',

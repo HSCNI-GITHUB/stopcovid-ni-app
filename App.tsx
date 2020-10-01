@@ -1,5 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {StatusBar, Platform, AppState, Image} from 'react-native';
+import {
+  StatusBar,
+  Platform,
+  AppState,
+  Image,
+  Text,
+  TextInput,
+  LogBox
+} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {enableScreens} from 'react-native-screens';
 import NetInfo from '@react-native-community/netinfo';
@@ -9,10 +17,12 @@ import PushNotification, {
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {Asset} from 'expo-asset';
 import * as Font from 'expo-font';
-import {ExposureProvider} from '@nearform/react-native-exposure-notification-service';
+import {
+  ExposureProvider,
+  KeyServerType,
+  getVersion
+} from 'react-native-exposure-notification-service';
 import * as SecureStore from 'expo-secure-store';
-import {BUILD_VERSION} from '@env';
-import {useTranslation} from 'react-i18next';
 
 import './services/i18n';
 
@@ -27,6 +37,14 @@ import {
   useSettings
 } from './providers/settings';
 import {Loading} from './components/views/loading';
+import {ReminderProvider} from './providers/reminder';
+import {notificationHooks} from './services/notifications';
+import {useAgeGroupTranslation} from './hooks';
+
+// This hides a warning from react-native-easy-markdown which is still using componentWillReceiveProps in its latest version
+LogBox.ignoreLogs([
+  'Warning: componentWillReceiveProps has been renamed, and is not recommended for use.'
+]);
 
 enableScreens();
 
@@ -46,6 +64,20 @@ function cacheImages(images: (string | number)[]) {
   });
 }
 
+// @ts-ignore
+Text.defaultProps = {};
+// @ts-ignore
+Text.defaultProps.maxFontSizeMultiplier = 1.3;
+// @ts-ignore
+Text.defaultProps.textBreakStrategy = 'simple';
+
+// @ts-ignore
+TextInput.defaultProps = {};
+// @ts-ignore
+TextInput.defaultProps.maxFontSizeMultiplier = 1.3;
+// @ts-ignore
+TextInput.defaultProps.textBreakStrategy = 'simple';
+
 const ExposureApp = ({
   notification,
   exposureNotificationClicked,
@@ -57,7 +89,7 @@ const ExposureApp = ({
 }) => {
   const [authToken, setAuthToken] = useState<string>('');
   const [refreshToken, setRefreshToken] = useState<string>('');
-  const {t} = useTranslation();
+  const {getTranslation} = useAgeGroupTranslation();
 
   const settings = useSettings();
   const application = useApplication();
@@ -93,18 +125,22 @@ const ExposureApp = ({
           refreshToken
       )}
       traceConfiguration={settings.traceConfiguration}
-      appVersion={BUILD_VERSION}
       serverUrl={urls.api}
+      keyServerUrl={urls.api}
+      keyServerType={KeyServerType.nearform}
       authToken={authToken}
       refreshToken={refreshToken}
       analyticsOptin={true}
-      notificationTitle={t('closeContactNotification:title')}
-      notificationDescription={t('closeContactNotification:description')}>
+      notificationTitle={getTranslation('closeContactNotification:title')}
+      notificationDescription={getTranslation(
+        'closeContactNotification:description'
+      )}>
       <StatusBar barStyle="default" />
       <Navigation
-        user={settings.user}
+        user={application.user}
         notification={notification}
         exposureNotificationClicked={exposureNotificationClicked}
+        completedExposureOnboarding={application.completedExposureOnboarding}
         setState={setState}
       />
     </ExposureProvider>
@@ -129,10 +165,7 @@ const App = (props: {exposureNotificationClicked: Boolean | null}) => {
     async function loadResourcesAndDataAsync() {
       try {
         const imageAssets = cacheImages([
-          require('./assets/images/logo/logo.png'),
-          require('./assets/images/onboarding-group/image.png'),
-          require('./assets/images/map/image.png'),
-          require('./assets/images/wave/image.png')
+          require('./assets/images/logo/logo.png')
         ]);
 
         await Font.loadAsync({
@@ -154,42 +187,28 @@ const App = (props: {exposureNotificationClicked: Boolean | null}) => {
 
     loadResourcesAndDataAsync();
 
-    PushNotification.configure({
-      onRegister: function () {},
-      onNotification: async function (notification) {
-        let requiresHandling = false;
-        if (Platform.OS === 'ios') {
-          console.log('iOS notification', notification, AppState.currentState);
-          if (
-            (notification && notification.userInteraction) ||
-            (AppState.currentState === 'active' && notification)
-          ) {
-            PushNotification.setApplicationIconBadgeNumber(0);
-            requiresHandling = true;
-            setTimeout(() => {
-              notification.finish(
-                Platform.OS === 'ios'
-                  ? PushNotificationIOS.FetchResult.NoData
-                  : ''
-              );
-            }, 3000);
-          }
+    notificationHooks.handleNotification = async function (notification) {
+      let requiresHandling = false;
+      if (Platform.OS === 'ios') {
+        if (
+          (notification && notification.userInteraction) ||
+          (AppState.currentState === 'active' && notification)
+        ) {
+          PushNotification.setApplicationIconBadgeNumber(0);
+          requiresHandling = true;
+          setTimeout(() => {
+            notification.finish(
+              Platform.OS === 'ios'
+                ? PushNotificationIOS.FetchResult.NoData
+                : ''
+            );
+          }, 3000);
         }
-        if (requiresHandling) {
-          console.log('setting notification');
-          setTimeout(() => setState((s) => ({...s, notification})), 500);
-        }
-      },
-      // @TODO - change for NI
-      senderID: '1087125483031',
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true
-      },
-      popInitialNotification: true,
-      requestPermissions: false
-    });
+      }
+      if (requiresHandling) {
+        setTimeout(() => setState((s) => ({...s, notification})), 500);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -204,20 +223,22 @@ const App = (props: {exposureNotificationClicked: Boolean | null}) => {
                 return <Loading />;
               }
               return (
-                <ApplicationProvider
-                  user={settingsValue.user}
-                  onboarded={settingsValue.onboarded}
-                  completedExposureOnboarding={
-                    settingsValue.completedExposureOnboarding
-                  }>
-                  <ExposureApp
-                    notification={state.notification}
-                    exposureNotificationClicked={
-                      state.exposureNotificationClicked
-                    }
-                    setState={setState}
-                  />
-                </ApplicationProvider>
+                <ReminderProvider>
+                  <ApplicationProvider
+                    user={settingsValue.user}
+                    onboarded={settingsValue.onboarded}
+                    completedExposureOnboarding={
+                      settingsValue.completedExposureOnboarding
+                    }>
+                    <ExposureApp
+                      notification={state.notification}
+                      exposureNotificationClicked={
+                        state.exposureNotificationClicked
+                      }
+                      setState={setState}
+                    />
+                  </ApplicationProvider>
+                </ReminderProvider>
               );
             }}
           </SettingsContext.Consumer>

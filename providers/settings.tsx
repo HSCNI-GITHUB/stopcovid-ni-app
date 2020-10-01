@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import i18n, {TFunction} from 'i18next';
 import {useTranslation} from 'react-i18next';
 import {isObject} from 'formik';
-import {TraceConfiguration} from '@nearform/react-native-exposure-notification-service';
+import {TraceConfiguration} from 'react-native-exposure-notification-service';
 
 import * as api from '../services/api';
 
@@ -85,7 +85,6 @@ const loadSettingsAsync = async (
   let apiSettings;
   try {
     apiSettings = await api.loadSettings();
-    console.log(apiSettings);
   } catch (e) {
     console.log('Error loading settings: ', e);
     apiSettings = {};

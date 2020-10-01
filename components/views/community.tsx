@@ -3,7 +3,6 @@ import {
   ScrollView,
   View,
   Text,
-  Image,
   StyleSheet,
   Share,
   Platform
@@ -14,6 +13,7 @@ import {TFunction} from 'i18next';
 import {ModalHeader} from '../molecules/modal-header';
 import colors from '../../constants/colors';
 import Spacing from '../atoms/spacing';
+import Illustration from '../atoms/illustration';
 import {text} from '../../theme';
 import Button from '../atoms/button';
 import {useApplication} from '../../providers/context';
@@ -57,9 +57,10 @@ export const Community: FC = () => {
       />
       <Spacing s={34} />
       <View style={styles.content}>
-        <Image
+        <Illustration
           source={CommunityIllustration}
           accessibilityIgnoresInvertColors={false}
+          accessibilityHint={t('community:accessibility:illustrationAlt')}
         />
         <Spacing s={43} />
         <Text style={styles.body}>{t('community:body')}</Text>
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   body: {
-    ...text.medium,
+    ...text.largeBody,
     color: colors.white,
     textAlign: 'center'
   },

@@ -14,9 +14,11 @@ import {PushNotification as PN} from 'react-native-push-notification';
 
 import colors from '../../constants/colors';
 import {isMountedRef, navigationRef, ScreenNames} from '../../navigation';
+import {User} from '../../providers/context';
 import {Onboarding} from '../views/onboarding';
 import {AgeConfirmation} from '../views/age-confirmation';
 import {LocationConfirmation} from '../views/location-confirmation';
+import {AgeSorting} from '../views/age-sorting';
 import {Dashboard} from '../views/dashboard';
 import {Community} from '../views/community';
 import {TestsAdd} from '../views/tests-add';
@@ -32,10 +34,16 @@ import {Tests} from '../views/tests';
 import {DataPolicy} from '../views/data-policy';
 import {Debug} from '../views/debug';
 import {NIState} from 'App';
+import {useAgeGroupTranslation, GetTranslation} from '../../hooks';
+import {Pause} from '../views/pause';
+import {YourDataModal} from '../views/onboarding/your-data-modal';
+import {TestResultModal} from '../views/onboarding/test-result-modal';
+import {PrivacyModal} from '../views/onboarding/privacy-modal';
+import {notificationHooks} from '../../services/notifications';
 
 const Stack = createStackNavigator();
 
-const Screens = (t: TFunction, user: string | null) => {
+const Screens = (t: TFunction, getTranslation: GetTranslation, user?: User) => {
   const header = () => null;
   return [
     {
@@ -61,7 +69,24 @@ const Screens = (t: TFunction, user: string | null) => {
       }
     },
     {
+      name: ScreenNames.ageSorting,
+      component: AgeSorting,
+      options: {
+        title: getTranslation('viewNames:ageSorting'),
+        header
+      }
+    },
+    {
       name: ScreenNames.onboarding,
+      component: Onboarding,
+      options: {
+        title: t('viewNames:onboarding'),
+        header,
+        cardStyle: {}
+      }
+    },
+    {
+      name: ScreenNames.askPermissions,
       component: Onboarding,
       options: {
         title: t('viewNames:onboarding'),
@@ -201,7 +226,12 @@ const Screens = (t: TFunction, user: string | null) => {
       options: {
         title: t('viewNames:dataPolicy'),
         header,
-        cardStyle: {}
+        cardStyle: {},
+        cardStyleInterpolator: user
+          ? CardStyleInterpolators.forHorizontalIOS
+          : CardStyleInterpolators.forRevealFromBottomAndroid,
+        gestureEnabled: true,
+        gestureDirection: user ? 'horizontal' : 'vertical'
       }
     },
     {
@@ -230,14 +260,75 @@ const Screens = (t: TFunction, user: string | null) => {
         header,
         cardStyle: {}
       }
+    },
+    {
+      name: ScreenNames.pause,
+      component: Pause,
+      options: {
+        title: t('viewNames:pause'),
+        header,
+        cardStyle: {backgroundColor: 'transparent'},
+        cardStyleInterpolator:
+          Platform.OS === 'ios'
+            ? CardStyleInterpolators.forVerticalIOS
+            : CardStyleInterpolators.forRevealFromBottomAndroid,
+        gestureEnabled: true,
+        gestureDirection: 'vertical'
+      }
+    },
+    {
+      name: ScreenNames.yourDataModal,
+      component: YourDataModal,
+      options: {
+        title: t('viewNames:yourDataModal'),
+        header,
+        cardStyle: {backgroundColor: 'transparent'},
+        cardStyleInterpolator:
+          Platform.OS === 'ios'
+            ? CardStyleInterpolators.forVerticalIOS
+            : CardStyleInterpolators.forRevealFromBottomAndroid,
+        gestureEnabled: true,
+        gestureDirection: 'vertical'
+      }
+    },
+    {
+      name: ScreenNames.testResultModal,
+      component: TestResultModal,
+      options: {
+        title: t('viewNames:testResultModal'),
+        header,
+        cardStyle: {backgroundColor: 'transparent'},
+        cardStyleInterpolator:
+          Platform.OS === 'ios'
+            ? CardStyleInterpolators.forVerticalIOS
+            : CardStyleInterpolators.forRevealFromBottomAndroid,
+        gestureEnabled: true,
+        gestureDirection: 'vertical'
+      }
+    },
+    {
+      name: ScreenNames.privacyModal,
+      component: PrivacyModal,
+      options: {
+        title: t('viewNames:privacyModal'),
+        header,
+        cardStyle: {backgroundColor: 'transparent'},
+        cardStyleInterpolator:
+          Platform.OS === 'ios'
+            ? CardStyleInterpolators.forVerticalIOS
+            : CardStyleInterpolators.forRevealFromBottomAndroid,
+        gestureEnabled: true,
+        gestureDirection: 'vertical'
+      }
     }
   ];
 };
 
 interface Navigation {
-  user: string | null;
+  user?: User;
   notification: PN | null;
   exposureNotificationClicked: Boolean | null;
+  completedExposureOnboarding: Boolean | null;
   setState: (value: React.SetStateAction<NIState>) => void;
 }
 
@@ -245,9 +336,11 @@ const Navigation: FC<Navigation> = ({
   user,
   notification,
   exposureNotificationClicked,
+  completedExposureOnboarding,
   setState
 }) => {
   const {t} = useTranslation();
+  const {getTranslation} = useAgeGroupTranslation();
   useEffect(() => {
     (isMountedRef as MutableRefObject<boolean>).current = true;
     return () => {
@@ -280,13 +373,17 @@ const Navigation: FC<Navigation> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exposureNotificationClicked]);
 
-  const initialScreen = user
-    ? ScreenNames.dashboard
-    : ScreenNames.ageConfirmation;
+  const initialScreen =
+    user?.valid && completedExposureOnboarding
+      ? ScreenNames.dashboard
+      : user?.valid
+      ? ScreenNames.askPermissions
+      : ScreenNames.ageConfirmation;
 
   return (
     <NavigationContainer
       ref={(e) => {
+        notificationHooks.navigation = e as NavigationContainerRef;
         (navigationRef as MutableRefObject<NavigationContainerRef | null>).current = e;
       }}>
       <Stack.Navigator
@@ -298,8 +395,9 @@ const Navigation: FC<Navigation> = ({
           animationEnabled: true
         }}
         initialRouteName={initialScreen}
-        headerMode="float">
-        {Screens(t, user).map((screen, index) => (
+        headerMode="float"
+        mode="modal">
+        {Screens(t, getTranslation, user).map((screen, index) => (
           // @ts-ignore
           <Stack.Screen {...screen} key={`screen-${index}`} />
         ))}

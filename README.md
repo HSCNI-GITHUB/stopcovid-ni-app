@@ -1,4 +1,4 @@
-# STOPCovid NI
+# COVID Tracker
 
 ## Getting Started
 
@@ -21,6 +21,8 @@ For other installation methods, follow the official [Installation guide](https:/
 ### Installing
 
 Clone this repository.
+
+Before installing the npm dependencies, you will need to authenticate to GitHub packages so that private packages can be installed. See [Authenticating to GitHub Packages](https://docs.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#authenticating-to-github-packages) for the steps on how to configure npm.
 
 Install the npm dependencies:
 

@@ -9,12 +9,11 @@ import {
 import {useTranslation} from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 import {useNavigation} from '@react-navigation/native';
-import {useExposure} from '@nearform/react-native-exposure-notification-service';
+import {useExposure} from 'react-native-exposure-notification-service';
 
 import Markdown from '../atoms/markdown';
 import colors from '../../constants/colors';
 import {text} from '../../theme';
-import {Title} from '../atoms/title';
 import {Back} from '../atoms/back';
 import Button from '../atoms/button';
 import {useApplication} from '../../providers/context';
@@ -22,6 +21,7 @@ import {forget} from '../../services/api';
 import {ScreenNames} from '../../navigation';
 import {useSettings} from '../../providers/settings';
 import Spacing from '../atoms/spacing';
+import {ModalTitle} from '../views/onboarding/common';
 
 export const Leave: FC = () => {
   const {t} = useTranslation();
@@ -77,7 +77,7 @@ export const Leave: FC = () => {
   return (
     <ScrollView style={styles.container}>
       <Back />
-      <Title title="leave:title" />
+      <ModalTitle narrow={false}>{t('leave:title')}</ModalTitle>
       <Markdown markdownStyles={markdownStyle}>{t('leave:body')}</Markdown>
       <Button
         style={styles.button}
@@ -87,15 +87,18 @@ export const Leave: FC = () => {
         onPress={confirm}>
         {t('leave:control:label')}
       </Button>
-      <Spacing s={44} />
+      <Spacing s={94} />
     </ScrollView>
   );
 };
 
 const markdownStyle = StyleSheet.create({
   text: {
-    ...text.medium,
-    color: colors.darkGrey
+    ...text.largeBody,
+    color: colors.black
+  },
+  block: {
+    marginBottom: 30
   }
 });
 

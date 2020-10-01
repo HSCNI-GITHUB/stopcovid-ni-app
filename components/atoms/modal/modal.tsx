@@ -1,5 +1,16 @@
-import React from 'react';
-import {StyleSheet, Text, View, ViewStyle} from 'react-native';
+import React, {createRef, Fragment, useEffect} from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  TextInput,
+  findNodeHandle,
+  AccessibilityInfo
+} from 'react-native';
 import ReactNativeModal, {
   ModalProps as ReactNativeModalProps
 } from 'react-native-modal';
@@ -29,6 +40,7 @@ export interface ModalProps extends Partial<ReactNativeModalProps> {
   isVisible?: boolean;
   closeButton?: boolean;
   onClose(): void;
+  scrollable?: boolean;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -39,13 +51,37 @@ const Modal: React.FC<ModalProps> = ({
   style,
   isVisible = true,
   closeButton = true,
+  scrollable = false,
   ...rest
 }) => {
   const insets = useSafeArea();
+  const titleRef = createRef<TextInput>();
+
+  useEffect(() => {
+    if (titleRef.current) {
+      const tag = findNodeHandle(titleRef.current);
+      tag &&
+        setTimeout(
+          () =>
+            titleRef.current && AccessibilityInfo.setAccessibilityFocus(tag),
+          250
+        );
+    }
+  }, [titleRef]);
+
+  const ViewType = scrollable ? ScrollView : View;
+  const TouchableType = scrollable
+    ? TouchableOpacity
+    : TouchableWithoutFeedback;
 
   return (
     <View style={styles.wrapper}>
       <ReactNativeModal
+        swipeDirection={['down']}
+        propagateSwipe={true}
+        onSwipeComplete={onClose}
+        onBackButtonPress={onClose}
+        onBackdropPress={onClose}
         {...rest}
         isVisible={isVisible}
         style={styles.bottomModal}>
@@ -55,34 +91,46 @@ const Modal: React.FC<ModalProps> = ({
             {paddingBottom: insets.bottom},
             style
           ]}>
-          {closeButton && (
-            <View style={styles.closeHeader}>
-              <ModalClose onPress={onClose} notification />
-            </View>
-          )}
-          {title && <Text style={styles.title}>{title}</Text>}
-          <Spacing s={24} />
-          {children}
-          <Spacing s={24} />
-          {!!buttons &&
-            buttons.map(({label, hint, action, type, buttonStyle}, index) => (
+          <ViewType>
+            <TouchableType>
               <>
-                <Button
-                  type={type || 'inverted'}
-                  label={label}
-                  key={index}
-                  onPress={() => {
-                    action();
-                    onClose();
-                  }}
-                  hint={hint}
-                  buttonStyle={buttonStyle}>
-                  {label}
-                </Button>
-                {index + 1 < buttons.length && <Spacing s={16} />}
+                {closeButton && (
+                  <View style={styles.closeHeader}>
+                    <ModalClose onPress={onClose} notification />
+                  </View>
+                )}
+                {title && (
+                  <Text ref={titleRef} style={styles.title}>
+                    {title}
+                  </Text>
+                )}
+                <Spacing s={24} />
+                {children}
+                <Spacing s={24} />
+                {!!buttons &&
+                  buttons.map(
+                    ({label, hint, action, type, buttonStyle}, index) => (
+                      <Fragment key={`${label}-${index}`}>
+                        <Button
+                          type={type || 'inverted'}
+                          label={label}
+                          key={index}
+                          onPress={async () => {
+                            await action();
+                            onClose();
+                          }}
+                          hint={hint}
+                          buttonStyle={buttonStyle}>
+                          {label}
+                        </Button>
+                        {index + 1 < buttons.length && <Spacing s={16} />}
+                      </Fragment>
+                    )
+                  )}
+                <Spacing s={30} />
               </>
-            ))}
-          <Spacing s={30} />
+            </TouchableType>
+          </ViewType>
         </View>
       </ReactNativeModal>
     </View>
@@ -90,10 +138,12 @@ const Modal: React.FC<ModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  wrapper: {height: 0},
+  wrapper: {
+    height: 0
+  },
   closeHeader: {
     alignItems: 'flex-end',
-    paddingVertical: 30
+    paddingBottom: 30
   },
   title: {
     ...text.large,
@@ -104,9 +154,11 @@ const styles = StyleSheet.create({
     margin: 0
   },
   contentContainer: {
+    flexGrow: 0,
     paddingHorizontal: SPACING_HORIZONTAL,
     paddingBottom: SPACING_BOTTOM,
-    backgroundColor: colors.white
+    backgroundColor: colors.white,
+    paddingTop: 30
   }
 });
 

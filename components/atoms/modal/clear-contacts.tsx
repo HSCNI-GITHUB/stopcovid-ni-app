@@ -1,7 +1,8 @@
 import React, {FC} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet} from 'react-native';
-import {useExposure} from '@nearform/react-native-exposure-notification-service';
+import {useExposure} from 'react-native-exposure-notification-service';
+import * as SecureStore from 'expo-secure-store';
 
 import Markdown from '../markdown';
 import Modal from '.';
@@ -23,6 +24,7 @@ export const ClearContactsModal: FC<ModalProps> = (props) => {
             try {
               await deleteExposureData();
               await getCloseContacts();
+              await SecureStore.deleteItemAsync('niexposuredate');
             } catch (e) {
               console.log('Error deleting exposure data', e);
             }
@@ -34,7 +36,7 @@ export const ClearContactsModal: FC<ModalProps> = (props) => {
           action: () => {},
           hint: t('modals:clearContacts:cancelBtnHint'),
           label: t('modals:clearContacts:cancelBtnLabel'),
-          type: 'default',
+          type: 'primary',
           buttonStyle: {
             borderColor: colors.black,
             borderWidth: 1
@@ -52,7 +54,9 @@ export const ClearContactsModal: FC<ModalProps> = (props) => {
 const modalMarkdownStyles = StyleSheet.create({
   text: {
     ...text.medium,
-    color: colors.black,
+    color: colors.black
+  },
+  block: {
     textAlign: 'center'
   }
 });

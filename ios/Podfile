@@ -1,4 +1,4 @@
-platform :ios, '12.0'
+platform :ios, '10.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 require_relative '../node_modules/react-native-unimodules/cocoapods.rb'
 
@@ -48,19 +48,19 @@ end
 # Convert all permission pods into static libraries
 pre_install do |installer|
   installer.pod_targets.each do |pod|
-    if pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-') || pod.name.eql?('RNSslPinning')
+    if pod.name.eql?('BugsnagReactNative') || pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-') || pod.name.eql?('RNSslPinning')
       def pod.build_type;
         # Uncomment one line depending on your CocoaPods version
         Pod::BuildType.static_library # >= 1.9
         # Pod::Target::BuildType.static_library # < 1.9
       end
-    end
+    end    
   end
 end
 
 target 'StopCOVIDNI' do
   # Pods for StopCOVIDNI
-  pod 'react-native-exposure-notification-service', :path => "../node_modules/@nearform/react-native-exposure-notification-service"
+  pod 'react-native-exposure-notification-service', :path => "../node_modules/react-native-exposure-notification-service"
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"
@@ -84,7 +84,7 @@ target 'StopCOVIDNI' do
   pod 'React-jsi', :path => '../node_modules/react-native/ReactCommon/jsi'
   pod 'React-jsiexecutor', :path => '../node_modules/react-native/ReactCommon/jsiexecutor'
   pod 'React-jsinspector', :path => '../node_modules/react-native/ReactCommon/jsinspector'
-  pod 'ReactCommon/callinvoker', :path => "../node_modules/react-native/ReactCommon"
+  pod 'React-callinvoker', :path => '../node_modules/react-native/ReactCommon/callinvoker'
   pod 'ReactCommon/turbomodule/core', :path => "../node_modules/react-native/ReactCommon"
   pod 'Yoga', :path => '../node_modules/react-native/ReactCommon/yoga', :modular_headers => true
 
@@ -98,14 +98,11 @@ target 'StopCOVIDNI' do
   pod 'SSZipArchive'
   pod 'Alamofire', '~> 5.2'
   pod 'KeychainSwift', '~> 19.0'
-
-  target 'StopCOVIDNITests' do
-    inherit! :complete
-    # Pods for testing
-  end
-
+  
   use_native_modules!
+
   use_unimodules!
+
   use_frameworks!
   # Enables Flipper.
   #
@@ -115,4 +112,5 @@ target 'StopCOVIDNI' do
   # post_install do |installer|
   #   flipper_post_install(installer)
   # end
+
 end

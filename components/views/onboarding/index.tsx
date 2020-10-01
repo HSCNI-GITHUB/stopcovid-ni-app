@@ -5,16 +5,12 @@ import {
   Alert,
   Animated,
   Dimensions,
-  Platform,
   ScrollView,
-  StyleSheet,
-  Text,
-  findNodeHandle,
-  AccessibilityInfo
+  StyleSheet
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import Spinner from 'react-native-loading-spinner-overlay';
-import {useExposure} from '@nearform/react-native-exposure-notification-service';
+import {useExposure} from 'react-native-exposure-notification-service';
 
 import Layouts from '../../../theme/layouts';
 import WhyUse from './why-use';
@@ -22,21 +18,30 @@ import YourData from './your-data';
 import PermissionsInfo from './permissions-info';
 import PrivacyInfo from './privacy';
 import UpgradeNotice from './upgrade-notice';
-import Spacing from '../../atoms/spacing';
-import {text} from '../../../theme';
 import {register} from '../../../services/api';
 import {useApplication} from '../../../providers/context';
 import colors from '../../../constants/colors';
-import PrivacyAgreement from './agreement';
+import TermsNotice from './terms-notice';
+import TermsAgreement from './terms-agreement';
+import TestResult from './test-result';
 
 enum OnboardingStatus {
   'whyUse' = 1,
   'yourData' = 2,
-  'privacy' = 3,
-  'agreement' = 4,
-  'permissionsInfo' = 5,
-  'upgradeNotice' = 5.1
+  'testResult' = 3,
+  'privacy' = 4,
+  'termsNotice' = 5,
+  'termsAgreement' = 6,
+  'permissionsInfo' = 7,
+  'upgradeNotice' = 7.1
 }
+
+const onboardingBackgrounds: {[key in OnboardingStatus]?: string} = {
+  [OnboardingStatus.whyUse]: colors.teal,
+  [OnboardingStatus.yourData]: colors.pastelRed,
+  [OnboardingStatus.testResult]: colors.pastelGreen,
+  [OnboardingStatus.privacy]: colors.pastelYellow
+};
 
 interface State {
   page: OnboardingStatus;
@@ -52,6 +57,11 @@ interface OnboardingProps {
 const width = Dimensions.get('window').width;
 const ANIMATION_DURATION = 200;
 
+enum RegistrationError {
+  'INVALID' = 'Invalid verification',
+  'TIMESTAMP' = 'Invalid timestamp'
+}
+
 export const Onboarding: FC<OnboardingProps> = ({navigation}) => {
   const {t} = useTranslation();
   const exposure = useExposure();
@@ -63,32 +73,13 @@ export const Onboarding: FC<OnboardingProps> = ({navigation}) => {
     loading: false
   });
   const scrollViewRef = useRef<ScrollView>(null);
-  const focusStart = useRef<any>();
-
-  useEffect(() => {
-    if (app.accessibility.screenReaderEnabled && focusStart.current) {
-      const tag = findNodeHandle(focusStart.current);
-      if (tag) {
-        setTimeout(() => AccessibilityInfo.setAccessibilityFocus(tag), 250);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     Animated.timing(status.slideInX, {
       toValue: 0,
       duration: ANIMATION_DURATION,
       useNativeDriver: true
-    }).start(() => {
-      if (app.accessibility.screenReaderEnabled && focusStart.current) {
-        const tag = findNodeHandle(focusStart.current);
-        if (tag) {
-          setTimeout(() => AccessibilityInfo.setAccessibilityFocus(tag), 250);
-        }
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }).start();
   }, [status]);
 
   const handleNext = () => {
@@ -125,22 +116,31 @@ export const Onboarding: FC<OnboardingProps> = ({navigation}) => {
       }));
       scrollViewRef.current?.scrollTo({x: 0, y: 0, animated: false});
     } catch (err) {
-      console.log('Error registering device: ', err, typeof err, err.message);
-      Alert.alert(
-        t('common:tryAgain:title'),
-        t('common:tryAgain:description'),
-        [
-          {
-            text: t('common:ok:label'),
-            style: 'default',
-            onPress: () =>
-              setStatus((s) => ({
-                ...s,
-                loading: false
-              }))
-          }
-        ]
-      );
+      console.log('Error registering device: ', err, err.message);
+      let title = t('common:tryAgain:title');
+      let message = t('common:tryAgain:description');
+      try {
+        const response = JSON.parse(await err.text());
+        console.log(response);
+        if (RegistrationError.TIMESTAMP === response.message) {
+          title = t('common:tryAgain:timestampTitle');
+          message = t('common:tryAgain:timestamp');
+        }
+      } catch (e) {
+        console.log('Error processing response');
+      }
+
+      Alert.alert(title, message, [
+        {
+          text: t('common:ok:label'),
+          style: 'default',
+          onPress: () =>
+            setStatus((s) => ({
+              ...s,
+              loading: false
+            }))
+        }
+      ]);
     }
   };
 
@@ -154,47 +154,51 @@ export const Onboarding: FC<OnboardingProps> = ({navigation}) => {
     scrollViewRef.current?.scrollTo({x: 0, y: 0, animated: false});
   };
 
-  const os = Platform.OS === 'ios' ? 'ios' : 'android';
+  const hideProgress = [
+    OnboardingStatus.permissionsInfo,
+    OnboardingStatus.upgradeNotice
+  ].includes(status.page);
 
   return (
     <Layouts.OnboardingWithNavbar
       canGoBack={
-        status.page === OnboardingStatus.yourData ||
-        status.page === OnboardingStatus.privacy ||
-        status.page === OnboardingStatus.agreement
+        ![
+          OnboardingStatus.termsAgreement,
+          OnboardingStatus.permissionsInfo,
+          OnboardingStatus.upgradeNotice
+        ].includes(status.page)
       }
-      goBack={goBack}
+      goBack={
+        status.page === OnboardingStatus.whyUse ? navigation.goBack : goBack
+      }
+      hideProgress={hideProgress}
+      backgroundColor={onboardingBackgrounds[status.page]}
       activeSection={Math.round(status.page)}
       scrollViewRef={scrollViewRef}
-      scrollableStyle={styles.scrollViewStyle}>
+      darkNavbar={status.page === OnboardingStatus.privacy}>
       <Animated.View
         style={[
           styles.animatedView,
           {transform: [{translateX: status.slideInX}]},
           {minHeight: Dimensions.get('window').height - 190}
-        ]}
-        accessibilityLiveRegion="polite">
-        <Text ref={focusStart} style={styles.heading}>
-          {status.page !== OnboardingStatus.upgradeNotice
-            ? t(`onboarding:${OnboardingStatus[status.page]}:view:title`)
-            : t(`onboarding:${OnboardingStatus[status.page]}:${os}:title`)}
-        </Text>
-        <Spacing s={24} />
+        ]}>
         {status.page === OnboardingStatus.whyUse && (
           <WhyUse handleNext={handleNext} />
         )}
         {status.page === OnboardingStatus.yourData && (
-          <YourData handleNext={handleNext} />
+          <YourData handleNext={handleNext} navigation={navigation} />
+        )}
+        {status.page === OnboardingStatus.testResult && (
+          <TestResult handleNext={handleNext} navigation={navigation} />
         )}
         {status.page === OnboardingStatus.privacy && (
-          <PrivacyInfo
-            disabled={status.loading}
-            handleNext={handleNext}
-            navigation={navigation}
-          />
+          <PrivacyInfo handleNext={handleNext} navigation={navigation} />
         )}
-        {status.page === OnboardingStatus.agreement && (
-          <PrivacyAgreement
+        {status.page === OnboardingStatus.termsNotice && (
+          <TermsNotice handleNext={handleNext} navigation={navigation} />
+        )}
+        {status.page === OnboardingStatus.termsAgreement && (
+          <TermsAgreement
             disabled={status.loading}
             handleNext={registerAndProceed}
           />
@@ -212,13 +216,5 @@ export const Onboarding: FC<OnboardingProps> = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  animatedView: {flex: 1},
-  heading: {
-    ...text.heading,
-    color: colors.white
-  },
-  scrollViewStyle: {
-    marginTop: 130,
-    paddingTop: 20
-  }
+  animatedView: {flex: 1}
 });

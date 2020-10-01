@@ -6,5 +6,6 @@ import App from '../App';
 import renderer from 'react-test-renderer';
 
 it('renders correctly', () => {
+  // @ts-ignore
   renderer.create(<App />);
 });

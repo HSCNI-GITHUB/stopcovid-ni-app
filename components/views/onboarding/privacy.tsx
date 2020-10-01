@@ -1,104 +1,111 @@
-import React, {FC} from 'react';
-import {StyleSheet, View, Image} from 'react-native';
+import React, {useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 import Button from '../../atoms/button';
 import Spacing from '../../atoms/spacing';
-import {text} from '../../../theme';
+import Illustration from '../../atoms/illustration';
+import {scale, text} from '../../../theme';
 import Markdown from '../../atoms/markdown';
-import {ArrowLink} from '../../molecules/arrow-link';
-import {ScreenNames} from '../../../navigation';
-import {StackNavigationProp} from '@react-navigation/stack';
 import colors from '../../../constants/colors';
+import {Content, styles as commonStyles} from './common';
+import {ScreenNames} from '../../../navigation';
+import {useAccessibilityElement} from '../../../hooks';
 
-const IconKey = require('../../../assets/images/icon-key/icon-key.png');
-const IconEye = require('../../../assets/images/icon-eye/icon-eye.png');
+const IllustrationSource = require('../../../assets/images/permissions-illustration/image.png');
 
 interface PrivacyProps {
   handleNext(): void;
 
   navigation: StackNavigationProp<any>;
-  disabled: boolean;
 }
 
-const PrivacyInfo: FC<PrivacyProps> = ({handleNext, disabled, navigation}) => {
+const PrivacyInfo: React.FC<PrivacyProps> = ({handleNext, navigation}) => {
   const {t} = useTranslation();
+  const {focusRef, focusAccessibleElement} = useAccessibilityElement();
+
+  useEffect(focusAccessibleElement, [focusAccessibleElement]);
 
   return (
     <>
       <View style={styles.container}>
+        <Illustration
+          source={IllustrationSource}
+          accessibilityHint={t(
+            'onboarding:privacy:accessibility:illustrationAlt'
+          )}
+        />
         <Spacing s={24} />
-        <View style={styles.row}>
-          <View style={styles.iconWrapper}>
-            <Image source={IconKey} accessibilityIgnoresInvertColors={false} />
-          </View>
-          <View style={styles.column}>
-            <Markdown markdownStyles={markdownStyles}>
-              {t('onboarding:privacy:view:textKey')}
-            </Markdown>
-            <ArrowLink
-              screen={ScreenNames.dataPolicy}
-              navigation={navigation}
-              accessibilityHint={t('onboarding:privacy:view:linkHint')}
-              accessibilityLabel={t('onboarding:privacy:view:link')}
-              textStyle={styles.scamsLink}
-              invert
-            />
-            <Markdown markdownStyles={markdownStyles}>
-              {t('onboarding:privacy:view:textKey1')}
-            </Markdown>
-          </View>
+        <View
+          ref={focusRef}
+          style={[commonStyles.titleWrapper, {borderColor: colors.darkerGrey}]}
+          accessibilityHint={t('onboarding:privacy:view:titleA11y')}>
+          <Markdown markdownStyles={titleMarkdownStyles}>
+            {t('onboarding:privacy:view:title')}
+          </Markdown>
         </View>
         <Spacing s={24} />
-        <View style={styles.row}>
-          <View style={styles.iconWrapper}>
-            <Image source={IconEye} accessibilityIgnoresInvertColors={false} />
-          </View>
-          <View style={styles.column}>
-            <Markdown markdownStyles={markdownStyles}>
-              {t('onboarding:privacy:view:textEye')}
-            </Markdown>
-          </View>
-        </View>
-        <Spacing s={48} />
+        <Content>
+          <Markdown markdownStyles={markdownStyles}>
+            {t('onboarding:privacy:view:text')}
+          </Markdown>
+        </Content>
       </View>
-      <View>
+      <Content>
+        <Spacing s={24} />
         <Button
-          disabled={disabled}
-          type="default"
+          textColor={colors.darkerGrey}
+          variant="small"
+          type="secondary"
+          onPress={() => navigation.navigate(ScreenNames.privacyModal)}
+          hint={t('onboarding:privacy:accessibility:moreHint')}
+          label={t('onboarding:privacy:accessibility:moreLabel')}>
+          {t('onboarding:privacy:accessibility:moreLabel')}
+        </Button>
+        <Spacing s={10} />
+        <Button
+          variant="small"
           onPress={handleNext}
-          hint={t('common:next:hint')}
-          label={t('common:next:label')}>
+          hint={t('onboarding:privacy:accessibility:nextHint')}
+          label={t('onboarding:privacy:accessibility:nextLabel')}>
           {t('common:next:label')}
         </Button>
-      </View>
-      <Spacing s={50} />
+        <Spacing s={50} />
+      </Content>
     </>
   );
 };
 
 const markdownStyles = StyleSheet.create({
-  h1: {
-    lineHeight: 20
-  },
   text: {
-    ...text.small
+    ...text.small,
+    color: colors.darkerGrey
   },
-  // @ts-ignore
   strong: {
-    ...text.smallBold
+    ...text.smallBold,
+    color: colors.darkerGrey
+  }
+});
+
+const titleMarkdownStyles = StyleSheet.create({
+  text: {
+    ...text.mediumBold,
+    color: colors.darkerGrey,
+    fontSize: scale(25)
+  },
+  u: {
+    textDecorationLine: 'underline'
   }
 });
 
 const styles = StyleSheet.create({
   container: {flex: 1},
-  column: {flex: 1, flexDirection: 'column'},
-  row: {flexDirection: 'row'},
-  iconWrapper: {width: 80, paddingLeft: 15, paddingTop: 15},
-  scamsLink: {
-    color: colors.white,
-    paddingVertical: 25
-  }
+  narrow: {paddingHorizontal: 35},
+  modal: {
+    backgroundColor: colors.onboardingModals.orange
+  },
+  title: {color: colors.darkerGrey}
 });
 
 export default PrivacyInfo;

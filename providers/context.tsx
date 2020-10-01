@@ -15,9 +15,16 @@ export interface Accessibility {
   screenReaderEnabled: boolean;
 }
 
+export enum UserAgeGroup {
+  ageGroup1 = 'ageGroup1',
+  ageGroup2 = 'ageGroup2',
+  ageGroup3 = 'ageGroup3'
+}
+
 export interface User {
   valid: boolean;
   tracking?: any[];
+  ageGroup: UserAgeGroup;
 }
 
 interface State {
@@ -124,9 +131,16 @@ export const AP = ({
   }, []);
 
   const setContext = async (data: Partial<State>) => {
-    setState((s) => ({...s, ...data}));
+    setState((s) => ({
+      ...s,
+      ...data,
+      ...(data.user ? {user: Object.assign({}, s.user, data.user)} : {})
+    }));
     if (data.user) {
-      await AsyncStorage.setItem('ni.user', JSON.stringify(data.user));
+      await AsyncStorage.setItem(
+        'ni.user',
+        JSON.stringify(Object.assign({}, state.user, data.user))
+      );
     }
     if (data.completedExposureOnboarding) {
       await AsyncStorage.setItem('ni.completedExposureOnboarding', 'y');

@@ -14,7 +14,6 @@ export const Back: FC = () => {
         accessible
         accessibilityRole="button"
         accessibilityHint={t('common:back:hint')}
-        accessibilityLabel={t('common:back:label')}
         onPress={() => navigation.goBack()}>
         <Image source={IconBack} accessibilityIgnoresInvertColors={false} />
       </TouchableWithoutFeedback>

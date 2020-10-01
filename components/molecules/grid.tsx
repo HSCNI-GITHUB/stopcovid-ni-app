@@ -3,12 +3,13 @@ import {StyleSheet, View, Animated} from 'react-native';
 import {
   useExposure,
   StatusState
-} from '@nearform/react-native-exposure-notification-service';
+} from 'react-native-exposure-notification-service';
 
 import colors from '../../constants/colors';
 import {Tile} from './tile';
 import Spacing from '../atoms/spacing';
 import {ScreenNames} from '../../navigation';
+import {useReminder} from '../../providers/reminder';
 
 const TracingIcon = require('../../assets/images/tracing/image.png');
 const InactiveTracingIcon = require('../../assets/images/tracing-inactive/white/image.png');
@@ -16,6 +17,7 @@ const ContactTracingIcon = require('../../assets/images/tracing-contact/image.pn
 const CommentIcon = require('../../assets/images/icon-comment/image.png');
 const CommunityIcon = require('../../assets/images/icon-community-white/image.png');
 const JarIcon = require('../../assets/images/icon-jar/image.png');
+const PausedIcon = require('../../assets/images/grid-paused/image.png');
 
 interface Grid {
   onboarded: Boolean;
@@ -31,27 +33,36 @@ export const Grid: FC<Grid> = ({
   onboardingCallback
 }) => {
   const {contacts, enabled, status} = useExposure();
+  const {paused} = useReminder();
   const hasContact = contacts && contacts.length > 0;
   const active = enabled && status.state === StatusState.active;
 
   const tracingIcon = hasContact
     ? ContactTracingIcon
+    : paused
+    ? PausedIcon
     : active
     ? TracingIcon
     : InactiveTracingIcon;
 
   const tracingLabel = hasContact
     ? 'dashboard:tracing:contact'
+    : paused
+    ? 'dashboard:tracing:paused'
     : 'dashboard:tracing:label';
 
   const tracingHint = hasContact
     ? 'dashboard:tracing:contact'
+    : paused
+    ? 'dashboard:tracing:pausedHint'
     : active
     ? 'dashboard:tracing:active'
     : 'dashboard:tracing:inactive';
 
   const tracingBackground = hasContact
     ? colors.red
+    : paused
+    ? colors.lightGray
     : active
     ? colors.darkGreen
     : colors.black;
@@ -65,6 +76,7 @@ export const Grid: FC<Grid> = ({
               backgroundColor={tracingBackground}
               label={tracingLabel}
               hint={tracingHint}
+              accessibilityHint={`dashboard:tourButtons:screen${stage}`}
               image={tracingIcon}
               minHeight={195}
               link={ScreenNames.tracing}
@@ -73,6 +85,7 @@ export const Grid: FC<Grid> = ({
           )}
           {stage === 2 && (
             <Tile
+              accessibilityHint={`dashboard:tourButtons:screen${stage}`}
               backgroundColor={colors.cream}
               label="dashboard:about:label"
               invertText
@@ -84,6 +97,7 @@ export const Grid: FC<Grid> = ({
           {stage === 1 && (
             <Tile
               backgroundColor={colors.blue}
+              accessibilityHint={`dashboard:tourButtons:screen${stage}`}
               label="dashboard:community:label"
               image={CommunityIcon}
               link={ScreenNames.community}
@@ -92,6 +106,7 @@ export const Grid: FC<Grid> = ({
           )}
           {stage === 3 && (
             <Tile
+              accessibilityHint={`dashboard:tourButtons:screen${stage}`}
               backgroundColor={colors.grassGreen}
               label="dashboard:test:label"
               invertText

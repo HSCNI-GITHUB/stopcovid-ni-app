@@ -12,7 +12,7 @@ import {
 import {format} from 'date-fns';
 import ExposureNotification, {
   useExposure
-} from '@nearform/react-native-exposure-notification-service';
+} from 'react-native-exposure-notification-service';
 
 import Button from '../atoms/button';
 
@@ -42,7 +42,6 @@ export const Debug = () => {
         .replace(/^,/, '')
         .split(',')
         .map((d) => {
-          console.log('DDD', d);
           return format(parseInt(d, 10), 'dd/MM HH:mm:ss');
         });
       logData.lastRun = dates.join(', ');
@@ -202,9 +201,7 @@ export const Debug = () => {
         Check Exposure
       </Button>
       <Spacing s={24} />
-      <Button type="default" onPress={deleteAllData}>
-        Delete All Data
-      </Button>
+      <Button onPress={deleteAllData}>Delete All Data</Button>
       <Spacing s={24} />
       {logData && (
         <View style={styles.logScroll}>

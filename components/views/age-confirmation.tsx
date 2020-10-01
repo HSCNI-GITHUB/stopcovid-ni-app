@@ -1,80 +1,65 @@
 import React, {FC, useRef, useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  Dimensions,
-  Animated,
-  Alert,
-  findNodeHandle,
-  AccessibilityInfo
-} from 'react-native';
+import {StyleSheet, View, Text, Image, Animated, Alert} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {StackNavigationProp} from '@react-navigation/stack';
 
 import Spacing from '../atoms/spacing';
 import Button from '../atoms/button';
-import colors from '../../constants/colors';
+import {text} from '../../theme';
 import {ScreenNames} from '../../navigation';
+import {useApplication, UserAgeGroup} from '../../providers/context';
+import {useAccessibilityElement} from '../../hooks';
 
 const LogoImage = require('../../assets/images/logo/logo.png');
-const OnboardingGroup = require('../../assets/images/onboarding-group/image.png');
-const MapBackground = require('../../assets/images/map/image.png');
-const WaveBackground = require('../../assets/images/wave/image.png');
 
 interface AgeConfirmationProps {
   navigation: StackNavigationProp<any>;
 }
 
-const {width, height} = Dimensions.get('window');
-const MAP_WIDTH = 357;
-const MAP_HEIGHT = 655;
-
-const WAVE_WIDTH = 375;
-const WAVE_HEIGHT = 332;
-
-const GROUP_WIDTH = 301;
-const GROUP_HEIGHT = 293;
-
 export const AgeConfirmation: FC<AgeConfirmationProps> = ({navigation}) => {
   const {t} = useTranslation();
-  const position = useRef(new Animated.Value(height + 100)).current;
+  const {setContext} = useApplication();
+  const {focusRef, focusAccessibleElement} = useAccessibilityElement(200);
   const opacity = useRef(new Animated.Value(0)).current;
-  const group = useRef(new Animated.Value(0)).current;
-  const ref = useRef<any>();
+  const opacity1 = useRef(new Animated.Value(0)).current;
+  const opacity2 = useRef(new Animated.Value(0)).current;
+  const opacity3 = useRef(new Animated.Value(0)).current;
+  const opacity4 = useRef(new Animated.Value(0)).current;
   const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
-    Animated.stagger(200, [
+    Animated.stagger(100, [
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 600,
+        duration: 500,
         useNativeDriver: true
       }),
-      Animated.timing(group, {
+      Animated.timing(opacity1, {
         toValue: 1,
-        duration: 600,
+        duration: 500,
         useNativeDriver: true
       }),
-      Animated.timing(position, {
-        toValue: 2,
-        duration: 700,
+      Animated.timing(opacity2, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true
+      }),
+      Animated.timing(opacity3, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true
+      }),
+      Animated.timing(opacity4, {
+        toValue: 1,
+        duration: 500,
         useNativeDriver: true
       })
     ]).start();
   });
 
-  useEffect(() => {
-    if (ref.current) {
-      const tag = findNodeHandle(ref.current);
-      if (tag) {
-        setTimeout(() => AccessibilityInfo.setAccessibilityFocus(tag), 200);
-      }
-    }
-  });
+  useEffect(() => focusAccessibleElement(), [focusAccessibleElement]);
 
-  const handleNo = () => {
+  const handleUnder = () => {
     setPressed(true);
     Alert.alert(
       t('ageRequirement:underAlert:title'),
@@ -91,144 +76,115 @@ export const AgeConfirmation: FC<AgeConfirmationProps> = ({navigation}) => {
     );
   };
 
+  const handleAgeGroupClick = async (ageGroup: UserAgeGroup) => {
+    await setContext({
+      user: {
+        ageGroup
+      }
+    });
+  };
+
   return (
     <>
       <View
-        ref={ref}
-        style={styles.background}
-        accessible={true}
-        accessibilityHint={t('viewNames:age')}>
-        <Animated.Image
-          style={[
-            styles.map,
-            {width, height: (width * MAP_HEIGHT) / MAP_WIDTH},
-            opacity
-          ]}
-          width={width}
-          height={(width * MAP_HEIGHT) / MAP_WIDTH}
-          source={MapBackground}
-          accessibilityIgnoresInvertColors={false}
-          resizeMode="contain"
-        />
-      </View>
-      <View testID="welcome" style={[styles.container]}>
-        <View style={styles.layer}>
+        ref={focusRef}
+        accessible
+        accessibilityHint={t('viewNames:age')}
+        style={styles.accessibilityView}
+      />
+      <View testID="welcome" style={styles.stretch}>
+        <View style={styles.logoContainer}>
           <Image
             source={LogoImage}
             accessibilityIgnoresInvertColors={false}
             resizeMode="center"
           />
         </View>
-        <View style={styles.group}>
-          <Animated.Image
-            style={{
-              width,
-              height: (width * GROUP_HEIGHT) / GROUP_WIDTH,
-              opacity: group
-            }}
-            width={width}
-            height={(width * GROUP_HEIGHT) / GROUP_WIDTH}
-            source={OnboardingGroup}
-            accessibilityIgnoresInvertColors={false}
-            resizeMode="center"
-          />
-        </View>
-        <Animated.View
-          style={(styles.bottom, {transform: [{translateY: position}]})}>
-          <View style={styles.bottomContainer}>
-            <Image
-              style={[
-                styles.wave,
-                {width, height: (width * WAVE_HEIGHT) / WAVE_WIDTH}
-              ]}
-              width={width}
-              height={(width * WAVE_HEIGHT) / WAVE_WIDTH}
-              source={WaveBackground}
-              accessibilityIgnoresInvertColors={false}
-              resizeMode="contain"
-            />
-            <Spacing s={20} />
-            <Text style={styles.notice}>{t('ageRequirement:notice')}</Text>
-            <Spacing s={38} />
+        <View style={[styles.stretch, styles.content]}>
+          <Animated.View style={{opacity}}>
+            <Text style={[styles.notice]} accessibilityRole="header">
+              {t('ageRequirement:notice')}
+            </Text>
+          </Animated.View>
+          <Spacing s={38} />
+          <Animated.View style={{opacity: opacity1}}>
             <Button
+              variant="small"
               disabled={pressed}
-              type="inverted"
-              onPress={() => {
-                setPressed(true);
+              onPress={async () => {
+                await handleAgeGroupClick(UserAgeGroup.ageGroup1);
                 navigation.replace(ScreenNames.locationConfirmation);
               }}
-              hint={t('ageRequirement:accessibility:overHint')}
-              label={t('ageRequirement:accessibility:overLabel')}>
-              {t('ageRequirement:over')}
+              hint={t('ageRequirement:button:ageGroup1:hint')}
+              label={t('ageRequirement:button:ageGroup1:label')}>
+              {t('ageRequirement:button:ageGroup1:label')}
             </Button>
-            <Spacing s={24} />
+          </Animated.View>
+          <Spacing s={20} />
+          <Animated.View style={{opacity: opacity2}}>
             <Button
+              variant="small"
               disabled={pressed}
-              type="link"
-              onPress={handleNo}
-              hint={t('ageRequirement:accessibility:underHint')}
-              label={t('ageRequirement:accessibility:underLabel')}>
-              {t('ageRequirement:under')}
+              onPress={async () => {
+                await handleAgeGroupClick(UserAgeGroup.ageGroup2);
+                navigation.push(ScreenNames.ageSorting);
+              }}
+              hint={t('ageRequirement:button:ageGroup2:hint')}
+              label={t('ageRequirement:button:ageGroup2:label')}>
+              {t('ageRequirement:button:ageGroup2:label')}
             </Button>
-            <Spacing s={24} />
-          </View>
-        </Animated.View>
+          </Animated.View>
+          <Spacing s={20} />
+          <Animated.View style={{opacity: opacity3}}>
+            <Button
+              variant="small"
+              disabled={pressed}
+              onPress={async () => {
+                await handleAgeGroupClick(UserAgeGroup.ageGroup3);
+                navigation.push(ScreenNames.ageSorting);
+              }}
+              hint={t('ageRequirement:button:ageGroup3:hint')}
+              label={t('ageRequirement:button:ageGroup3:label')}>
+              {t('ageRequirement:button:ageGroup3:label')}
+            </Button>
+          </Animated.View>
+          <Spacing s={20} />
+          <Animated.View style={{opacity: opacity4}}>
+            <Button
+              type="secondary"
+              variant="small"
+              disabled={pressed}
+              onPress={handleUnder}
+              hint={t('ageRequirement:button:under:hint')}
+              label={t('ageRequirement:button:under:label')}>
+              {t('ageRequirement:button:under:label')}
+            </Button>
+          </Animated.View>
+        </View>
       </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: 'relative',
-    zIndex: 10
+  stretch: {
+    flex: 1
   },
-  notice: {
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    fontSize: 20,
-    lineHeight: 30,
-    textAlign: 'center'
-  },
-  bottom: {
-    backgroundColor: colors.white,
+  logoContainer: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 20,
-    width: '100%'
-  },
-  bottomContainer: {
-    paddingHorizontal: 45,
-    paddingBottom: 30,
-    backgroundColor: colors.white
-  },
-  background: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 10,
-    backgroundColor: colors.teal,
-    flex: 1,
-    justifyContent: 'flex-end'
-  },
-  layer: {
-    position: 'relative',
-    zIndex: 20,
+    width: '100%',
     paddingTop: 60,
     alignItems: 'center'
   },
-  wave: {
-    position: 'absolute',
-    top: -40,
-    left: 0,
-    right: 0,
-    height: 400
+  content: {
+    justifyContent: 'center',
+    paddingHorizontal: 45
   },
-  map: {
-    right: 18
+  notice: {
+    ...text.medium,
+    textAlign: 'center'
   },
-  group: {
-    flex: 1
+  accessibilityView: {
+    ...StyleSheet.absoluteFillObject
   }
 });

@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React, {FC, useEffect} from 'react';
 import {
   ScrollView,
   View,
@@ -10,11 +10,12 @@ import {
   ImageStyle
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import {
   useExposure,
   StatusState
-} from '@nearform/react-native-exposure-notification-service';
+} from 'react-native-exposure-notification-service';
+import {format, isToday, isTomorrow} from 'date-fns';
 
 import {ModalHeader} from '../molecules/modal-header';
 
@@ -22,19 +23,45 @@ import colors from '../../constants/colors';
 import Spacing from '../atoms/spacing';
 import {text} from '../../theme';
 import Markdown from '../atoms/markdown';
+import Illustration from '../atoms/illustration';
 import {ScreenNames} from '../../navigation';
 import GoToSettings from '../molecules/go-to-settings';
+import Button from '../atoms/button';
+import {useReminder} from '../../providers/reminder';
+import {SPACING_HORIZONTAL} from '../../theme/layouts/shared';
+import {useAccessibilityElement} from '../../hooks';
 
 const TracingIcon = require('../../assets/images/tracing-active/image.png');
 const IconTracingActive = require('../../assets/images/icon-tracing-active-big/image.png');
 const IconTracingInactive = require('../../assets/images/icon-tracing-inactive-big/image.png');
 const TracingIllustration = require('../../assets/images/tracing-illustration/image.png');
+const IconPaused = require('../../assets/images/icon-paused/image.png');
+
+type RouteParams = {
+  params: {
+    previous?: ScreenNames;
+  };
+};
 
 export const Tracing: FC = () => {
+  const {checked, paused, deleteReminder} = useReminder();
   const {t} = useTranslation();
   const navigation = useNavigation();
-  const {enabled, status, contacts} = useExposure();
+  const {params} = useRoute<RouteProp<RouteParams, 'params'>>();
+  const {enabled, status, contacts, start} = useExposure();
   const tracingActive = enabled && status.state === StatusState.active;
+  const pauseDate = new Date(Number(paused));
+  const {focusRef, focusAccessibleElement} = useAccessibilityElement();
+
+  useEffect(() => {
+    if (params?.previous === ScreenNames.pause) {
+      focusAccessibleElement();
+    }
+  }, [params, focusAccessibleElement]);
+
+  if (!checked) {
+    return <ScrollView style={styles.container} />;
+  }
 
   const renderActive = () => (
     <>
@@ -95,11 +122,63 @@ export const Tracing: FC = () => {
     </>
   );
 
+  const pausedReminderTime = `${format(pauseDate, 'HH:mm')} ${
+    isToday(pauseDate)
+      ? t('common:today')
+      : isTomorrow(pauseDate)
+      ? t('common:tomorrow')
+      : ''
+  }`;
+
+  const renderPaused = () => (
+    <>
+      <Text style={[styles.text, styles.heading, styles.notActive]}>
+        {t('tracing:status:heading')}
+      </Text>
+      <Spacing s={20} />
+      <View style={styles.row}>
+        <View>
+          <Image
+            style={styles.moduleImage as ImageStyle}
+            source={IconPaused}
+            accessibilityIgnoresInvertColors={false}
+          />
+        </View>
+        <View>
+          <Text
+            style={[
+              styles.text,
+              styles.heading,
+              styles.status,
+              styles.notActive
+            ]}>
+            {t('tracing:paused:title')}
+          </Text>
+          <Text style={styles.reminder}>
+            {t('tracing:paused:reminder')}{' '}
+            <Text style={[styles.reminder, styles.underline]}>
+              {pausedReminderTime}
+            </Text>
+          </Text>
+        </View>
+      </View>
+      <Spacing s={20} />
+      <Markdown markdownStyles={inactiveMarkdownStyles}>
+        {t('tracing:paused:text')}
+      </Markdown>
+    </>
+  );
+
   return (
     <ScrollView style={styles.container}>
       <ModalHeader
         icon={TracingIcon}
-        heading="tracing:heading"
+        heading={'tracing:heading'}
+        accessibilityHint={
+          paused
+            ? t('tracing:paused:heading', {time: pausedReminderTime})
+            : t('tracing:heading')
+        }
         color={colors.darkGreen}
       />
       <Spacing s={34} />
@@ -126,23 +205,56 @@ export const Tracing: FC = () => {
             <Spacing s={55} />
           </>
         )}
-        <Image
+        <Illustration
           source={TracingIllustration}
           accessibilityIgnoresInvertColors={false}
+          accessibilityHint={t('tracing:accessibility:illustrationAlt')}
         />
         <Spacing s={43} />
         <Text style={styles.body}>{t('tracing:body')}</Text>
         <Spacing s={34} />
         <View
+          ref={focusRef}
+          accessibilityHint={
+            paused
+              ? t('tracing:paused:heading', {time: pausedReminderTime})
+              : t('tracing:heading')
+          }
           style={[
             styles.module,
-            tracingActive ? styles.active : styles.notActive
+            tracingActive && !paused ? styles.active : styles.notActive
           ]}>
-          {tracingActive ? renderActive() : renderInactive()}
+          {paused
+            ? renderPaused()
+            : tracingActive
+            ? renderActive()
+            : renderInactive()}
         </View>
         <Spacing s={20} />
+        {!paused && enabled && (
+          <Button
+            type="secondary"
+            textColor={colors.darkGreen}
+            onPress={() => navigation.navigate(ScreenNames.pause)}
+            style={styles.button}
+            buttonStyle={styles.buttonStyle}>
+            {t('tracing:buttonLabel')}
+          </Button>
+        )}
+
+        {paused && (
+          <Button
+            type="inverted"
+            style={styles.button}
+            onPress={async () => {
+              await start();
+              deleteReminder();
+            }}>
+            {t('tracing:paused:buttonLabel')}
+          </Button>
+        )}
       </View>
-      <Spacing s={80} />
+      <Spacing s={120} />
     </ScrollView>
   );
 };
@@ -225,7 +337,9 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   moduleImage: {
-    marginRight: 11
+    marginRight: 11,
+    width: 41,
+    height: 41
   },
   notification: {
     borderColor: colors.red,
@@ -240,5 +354,23 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontWeight: 'bold'
+  },
+  button: {
+    width: '100%'
+  },
+  buttonStyle: {
+    backgroundColor: 'transparent',
+    borderColor: colors.darkGreen,
+    borderStyle: 'solid',
+    borderWidth: 1
+  },
+  reminder: {
+    ...text.defaultBold,
+    color: colors.red,
+    paddingRight: SPACING_HORIZONTAL
+  },
+  underline: {
+    textDecorationColor: colors.red,
+    textDecorationLine: 'underline'
   }
 });

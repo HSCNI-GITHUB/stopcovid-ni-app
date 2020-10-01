@@ -7,8 +7,7 @@ export default (scale: (v: number) => number) => ({
     color: colors.black
   },
   defaultBold: {
-    fontFamily: 'aktiv-bold',
-    fontWeight: 'bold'
+    fontFamily: 'aktiv-bold'
   },
   xsmall: {
     fontFamily: 'aktiv',
@@ -22,7 +21,6 @@ export default (scale: (v: number) => number) => ({
   },
   smallBold: {
     fontFamily: 'aktiv-bold',
-    fontWeight: 'bold',
     fontSize: scale(15),
     lineHeight: scale(25),
     color: colors.white
@@ -52,9 +50,9 @@ export default (scale: (v: number) => number) => ({
     color: colors.lightBlack
   },
   heading: {
-    fontFamily: 'aktiv',
+    fontFamily: 'aktiv-bold',
     fontSize: scale(30),
-    lineHeight: scale(40),
+    lineHeight: scale(35),
     letterSpacing: -0.02
   },
   largeBody: {

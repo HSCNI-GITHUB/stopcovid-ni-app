@@ -16,12 +16,14 @@ export const BluetoothNotificationsModal: FC<ModalProps> = (props) => {
       title={t('modals:bluetoothNotifications:title')}
       buttons={[
         {
-          action: goToSettingsAction,
+          action: () => goToSettingsAction(true),
           hint: t('modals:bluetoothNotifications:btnLabel'),
           label: t('modals:bluetoothNotifications:btnLabel')
         }
       ]}>
-      <Markdown markdownStyles={modalMarkdownStyles}>
+      <Markdown
+        style={modalMarkdownStyles.container}
+        markdownStyles={modalMarkdownStyles}>
         {t('modals:bluetoothNotifications:instructions')}
       </Markdown>
     </Modal>
@@ -31,5 +33,8 @@ export const BluetoothNotificationsModal: FC<ModalProps> = (props) => {
 const modalMarkdownStyles = StyleSheet.create({
   text: {
     color: colors.black
+  },
+  container: {
+    marginBottom: 60
   }
 });

@@ -5,7 +5,7 @@ import {
   useExposure,
   StatusState,
   StatusType
-} from '@nearform/react-native-exposure-notification-service';
+} from 'react-native-exposure-notification-service';
 
 import Button from '../atoms/button';
 import {useTranslation} from 'react-i18next';

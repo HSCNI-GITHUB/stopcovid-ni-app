@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -12,24 +13,33 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="844"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="test-trace" translatesAutoresizingMaskIntoConstraints="NO" id="9Wz-ar-tXa">
-                    <rect key="frame" x="176.5" y="150" width="127" height="96.5"/>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="map" id="EuC-33-3yf">
+                    <rect key="frame" x="0.0" y="0.0" width="480" height="844"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                 </imageView>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="stop-covid-ni" translatesAutoresizingMaskIntoConstraints="NO" id="sX8-Hb-tfn">
-                    <rect key="frame" x="149.5" y="368.5" width="181" height="28"/>
+                    <rect key="frame" x="149.5" y="455.5" width="181" height="28"/>
                 </imageView>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="powered-by-logo" translatesAutoresizingMaskIntoConstraints="NO" id="HwU-P4-HIw">
-                    <rect key="frame" x="195" y="667.5" width="90" height="96.5"/>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" insetsLayoutMarginsFromSafeArea="NO" image="powered-by-logo" translatesAutoresizingMaskIntoConstraints="NO" id="HwU-P4-HIw">
+                    <rect key="frame" x="173" y="300" width="134" height="134"/>
+                </imageView>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="test-trace" translatesAutoresizingMaskIntoConstraints="NO" id="DDs-mK-RYd">
+                    <rect key="frame" x="176.5" y="664" width="127" height="96"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="127" id="bqP-l2-s4e"/>
+                        <constraint firstAttribute="height" constant="96" id="is3-8I-9an"/>
+                    </constraints>
                 </imageView>
             </subviews>
-            <color key="backgroundColor" red="0.29354163999999999" green="0.65249842410000003" blue="0.76081949469999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+            <color key="backgroundColor" red="0.0" green="0.49411764705882355" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="HwU-P4-HIw" secondAttribute="bottom" constant="80" id="7jq-6h-J1p"/>
-                <constraint firstItem="9Wz-ar-tXa" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="94Z-Zi-4CY"/>
-                <constraint firstItem="sX8-Hb-tfn" firstAttribute="top" secondItem="9Wz-ar-tXa" secondAttribute="bottom" constant="122" id="HHh-cN-7Jc"/>
-                <constraint firstItem="9Wz-ar-tXa" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="150" id="fjS-8M-3zM"/>
+                <constraint firstItem="HwU-P4-HIw" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="3mC-Xq-PcH"/>
+                <constraint firstItem="HwU-P4-HIw" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" constant="-55" id="9k9-S3-EbR"/>
+                <constraint firstItem="sX8-Hb-tfn" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="DyX-Zf-5De"/>
+                <constraint firstItem="DDs-mK-RYd" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottomMargin" constant="-50" id="Lab-Ue-jwA"/>
+                <constraint firstItem="sX8-Hb-tfn" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" constant="47.5" id="iQk-et-VLC"/>
                 <constraint firstItem="sX8-Hb-tfn" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="ln0-Pt-7bB"/>
-                <constraint firstItem="HwU-P4-HIw" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="pvP-4b-dnq"/>
+                <constraint firstItem="DDs-mK-RYd" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="uvN-tb-lwZ"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
@@ -37,8 +47,9 @@
         </view>
     </objects>
     <resources>
-        <image name="powered-by-logo" width="90" height="96.5"/>
+        <image name="map" width="348.5" height="751"/>
+        <image name="powered-by-logo" width="134" height="134"/>
         <image name="stop-covid-ni" width="181" height="28"/>
-        <image name="test-trace" width="127" height="96.5"/>
+        <image name="test-trace" width="127" height="96"/>
     </resources>
 </document>

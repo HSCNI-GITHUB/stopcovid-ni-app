@@ -72,13 +72,14 @@ export const SingleCodeInput: React.FC<SingleCodeInputProps> = ({
         selectTextOnFocus
         autoCapitalize="characters"
         style={[styles.input, error ? styles.errorBlock : styles.block]}
-        maxLength={count}
+        maxLength={value.length >= count - 1 ? count : undefined}
         keyboardType="default"
         returnKeyType="done"
         editable={!disabled}
         value={value}
         onFocus={onFocusHandler}
         onChangeText={onChangeTextHandler}
+        underlineColorAndroid="transparent"
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityHint}
       />
@@ -99,7 +100,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 24,
     borderWidth: 1,
-    letterSpacing: scale(10)
+    letterSpacing: scale(10),
+    backgroundColor: 'white'
   },
   block: {
     color: colors.black,

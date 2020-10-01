@@ -5,20 +5,33 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Image
+  Image,
+  TextProps
 } from 'react-native';
 
 import {baseStyles} from '../../theme';
 
+interface ButtonColors {
+  shadow: string;
+  background: string;
+  text: string;
+  pressedText?: string;
+  border?: string;
+}
+
 export type ButtonTypes =
-  | 'default'
+  | 'primary'
+  | 'secondary'
   | 'link'
   | 'inverted'
   | 'back'
   | 'smallRound';
 
+export type ButtonVariants = 'default' | 'small';
+
 interface ButtonProps {
   type?: ButtonTypes;
+  variant?: ButtonVariants;
   disabled?: boolean;
   onPress: () => void;
   style?: ViewStyle;
@@ -29,10 +42,12 @@ interface ButtonProps {
   textColor?: string;
   icon?: any;
   buttonStyle?: ViewStyle;
+  textProps?: TextProps;
 }
 
 const Button: React.FC<ButtonProps> = ({
-  type = 'default',
+  type = 'primary',
+  variant = 'default',
   disabled = false,
   onPress,
   style,
@@ -42,37 +57,58 @@ const Button: React.FC<ButtonProps> = ({
   label,
   textColor,
   icon,
-  buttonStyle
+  buttonStyle,
+  textProps = {}
 }) => {
   const [pressed, setPressed] = useState(false);
 
-  const buttonColors = useMemo(() => {
+  const buttonColors: ButtonColors = useMemo(() => {
     switch (type) {
-      case 'back':
-        return baseStyles.buttons.back;
-      case 'default':
-        return baseStyles.buttons.default;
+      case 'primary':
+        return baseStyles.buttons.primary;
+      case 'secondary':
+        return baseStyles.buttons.secondary;
       case 'inverted':
         return baseStyles.buttons.inverted;
       case 'link':
         return baseStyles.buttons.link;
+      case 'back':
+        return baseStyles.buttons.back;
       case 'smallRound':
         return baseStyles.buttons.smallRound;
       default:
-        return baseStyles.buttons.default;
+        return baseStyles.buttons.primary;
     }
   }, [type]);
 
+  const buttonVariant = useMemo(() => {
+    switch (variant) {
+      case 'default':
+        return styles.variantDefault;
+      case 'small':
+        return styles.variantSmall;
+      default:
+        return styles.variantDefault;
+    }
+  }, [variant]);
+
   let backgroundColor = buttonColors.shadow;
   let foregroundColor = buttonColors.background;
+  let borderColor = buttonColors.border;
   textColor = textColor || buttonColors.text;
 
   if (pressed) {
     foregroundColor = backgroundColor;
+    if (buttonColors.pressedText) {
+      textColor = buttonColors.pressedText;
+    }
   } else if (disabled) {
     // this should be enough for the moment
     backgroundColor += '66';
     foregroundColor += '66';
+    if (borderColor) {
+      borderColor += '66';
+    }
   }
 
   const pressHandlers = disabled
@@ -80,14 +116,18 @@ const Button: React.FC<ButtonProps> = ({
     : {
         onPressIn: () => setPressed(true),
         onPressOut: () => setPressed(false),
-        onPress
+        onPress: () => {
+          setPressed(false);
+          onPress();
+        }
       };
 
   return (
     <View
       style={[
         styles.wrapper,
-        {backgroundColor: backgroundColor},
+        buttonVariant,
+        type !== 'secondary' && {backgroundColor},
         type === 'link' && styles.wrapperLink,
         type === 'back' && styles.wrapperBack,
         type === 'smallRound' && styles.wrapperSmallRound,
@@ -97,7 +137,17 @@ const Button: React.FC<ButtonProps> = ({
       <TouchableOpacity
         style={[
           styles.button,
-          {backgroundColor: foregroundColor},
+          buttonVariant,
+          {
+            backgroundColor:
+              type === 'secondary' && disabled
+                ? baseStyles.buttons.secondary.background
+                : foregroundColor
+          },
+          !!borderColor && {
+            borderColor,
+            borderWidth: 1
+          },
           type === 'link' && styles.buttonLink,
           type === 'back' && styles.buttonBack,
           type === 'smallRound' && styles.buttonSmallRound,
@@ -105,7 +155,6 @@ const Button: React.FC<ButtonProps> = ({
         ]}
         accessibilityRole="button"
         importantForAccessibility="yes"
-        activeOpacity={1}
         accessibilityHint={hint}
         accessibilityLabel={label}
         {...pressHandlers}>
@@ -120,7 +169,9 @@ const Button: React.FC<ButtonProps> = ({
                 accessibilityIgnoresInvertColors={false}
               />
             )}
-            <Text style={[styles.text, {color: textColor}]}>{children}</Text>
+            <Text style={[styles.text, {color: textColor}]} {...textProps}>
+              {children}
+            </Text>
           </View>
         )}
       </TouchableOpacity>
@@ -129,10 +180,14 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
+  variantDefault: {
+    minHeight: 75
+  },
+  variantSmall: {
+    minHeight: 50
+  },
   wrapper: {
-    minHeight: 75,
     justifyContent: 'flex-start',
-    backgroundColor: baseStyles.buttons.default.shadow,
     borderRadius: 10
   },
   wrapperLink: {
@@ -150,12 +205,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   button: {
-    minHeight: 75,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: baseStyles.buttons.default.background,
     borderRadius: 10,
-    paddingHorizontal: 12
+    paddingHorizontal: 15,
+    paddingVertical: 10
   },
   buttonLink: {
     minHeight: 20,
@@ -172,7 +226,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   text: {
-    color: baseStyles.buttons.default.text,
+    color: baseStyles.buttons.primary.text,
     textAlign: 'center',
     textAlignVertical: 'center',
     fontStyle: 'normal',
@@ -181,6 +235,7 @@ const styles = StyleSheet.create({
     lineHeight: 20
   },
   row: {
+    alignItems: 'center',
     flexDirection: 'row'
   },
   icon: {

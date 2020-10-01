@@ -11,8 +11,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {useExposure} from '@nearform/react-native-exposure-notification-service';
-import * as SecureStore from 'expo-secure-store';
+import {useExposure, getVersion, Version} from 'react-native-exposure-notification-service';
 
 import {ModalHeader} from '../molecules/modal-header';
 
@@ -24,34 +23,29 @@ import {ClearContactsModal} from '../atoms/modal/clear-contacts';
 import Spacing from '../atoms/spacing';
 import {SPACING_BOTTOM} from '../../theme/layouts/shared';
 import {useSafeArea} from 'react-native-safe-area-context';
-import {HIDE_DEBUG, BUILD_VERSION} from '@env';
+import {HIDE_DEBUG} from '@env';
+import Markdown from '../atoms/markdown';
 
 const ArrowIcon = require('../../assets/images/icon-arrow-white/image.png');
 const SettingsIcon = require('../../assets/images/icon-settings-white/image.png');
 
 const REQUIRED_PRESS_COUNT = 3;
-
-const mockCloseContact = {
-  exposureAlertDate: '1595520188294',
-  attenuationDurations: [1, 1, 1],
-  daysSinceLastExposure: 1,
-  matchedKeyCount: 1,
-  maxRiskScore: 1,
-  summationRiskScore: 1
-};
+const SIMULATION_DELAY = 3;
 
 export const Settings = () => {
   const {t} = useTranslation();
   const navigation = useNavigation();
   const [clear, setClear] = useState(false);
-  const {contacts, setExposureState} = useExposure();
+  const [version, setVersion] = useState<Version>();
+  const {contacts, getCloseContacts, simulateExposure} = useExposure();
+  const [simulated, setSimulated] = useState(false);
   const insets = useSafeArea();
   const [showDebug, setShowDebug] = useState<boolean>(false);
   const [pressCount, setPressCount] = useState<number>(0);
 
   const headingPressHandler = async () => {
     if (HIDE_DEBUG === 'y') {
-      return
+      return;
     }
     setPressCount(pressCount + 1);
     if (!showDebug && pressCount + 1 >= REQUIRED_PRESS_COUNT) {
@@ -60,18 +54,18 @@ export const Settings = () => {
     }
   };
 
-  const simCloseContacts = async (remove = false) => {
-    if (remove) {
-      await SecureStore.deleteItemAsync('niexposuredate');
-    }
+  useEffect(() => {
+    setTimeout(getCloseContacts, (SIMULATION_DELAY + 0.5) * 1000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [simulated]);
 
-    setExposureState((s) => ({
-      ...s,
-      contacts: remove
-        ? []
-        : [mockCloseContact, mockCloseContact, mockCloseContact]
-    }));
-  };
+  useEffect(() => {
+    const getVer = async () => {
+      const ver = await getVersion()
+      setVersion(ver)
+    }
+    getVer();
+  }, [getVersion]);
 
   useEffect(() => {
     const init = async () => {
@@ -79,14 +73,14 @@ export const Settings = () => {
         const showDebugData = await AsyncStorage.getItem('cti.showDebug');
         if (showDebugData) {
           setShowDebug(showDebugData === 'y');
-        }
+        }        
       } catch (err) {
         console.log('Error reading "cti.showDebug" from async storage:', err);
       }
     };
     init();
   }, []);
-
+  
   return (
     <ScrollView
       style={styles.container}
@@ -134,9 +128,11 @@ export const Settings = () => {
             onPress={() => navigation.navigate(ScreenNames.leave)}
             accessibilityRole="link"
             accessibilityHint={t('settings:leave:hint')}
-            accessibilityLabel={t('settings:leave:label')}>
+            accessibilityLabel={t('settings:leave:hint')}>
             <View style={styles.linkContainer}>
-              <Text style={styles.button}>{t('settings:leave:label')}</Text>
+              <Markdown markdownStyles={markdownStyles}>
+                {t('settings:leave:label')}
+              </Markdown>
               <Image
                 source={ArrowIcon}
                 accessibilityIgnoresInvertColors={false}
@@ -162,7 +158,10 @@ export const Settings = () => {
 
           {showDebug && (
             <TouchableWithoutFeedback
-              onPress={() => simCloseContacts(false)}
+              onPress={() => {
+                simulateExposure(SIMULATION_DELAY);
+                setSimulated(true);
+              }}
               accessibilityRole="link"
               accessibilityHint={t('settings:sim:hint')}
               accessibilityLabel={t('settings:sim:label')}>
@@ -193,19 +192,21 @@ export const Settings = () => {
           </View>
         )}
       </View>
-      {clear && (
-        <ClearContactsModal
-          onClose={() => setClear(false)}
-          onBackButtonPress={() => setClear(false)}
-        />
-      )}
-      {BUILD_VERSION && (
+      <ClearContactsModal
+        isVisible={clear}
+        onClose={() => {
+          setClear(false);
+          setSimulated(false);
+        }}
+        onBackButtonPress={() => setClear(false)}
+      />
+      {version && (
         <>
           <Spacing s={24} />
           <Text
             style={styles.version}
-            accessibilityHint={t('common:version', {version: BUILD_VERSION})}>
-            App version: {BUILD_VERSION}
+            accessibilityHint={t('common:version', {version: version.display})}>
+            App version: {version.display}
           </Text>
         </>
       )}
@@ -213,6 +214,17 @@ export const Settings = () => {
     </ScrollView>
   );
 };
+
+const markdownStyles = StyleSheet.create({
+  text: {
+    ...text.smallBody,
+    color: colors.white
+  },
+  strong: {
+    ...text.largeBody,
+    color: colors.white
+  }
+});
 
 const styles = StyleSheet.create({
   container: {

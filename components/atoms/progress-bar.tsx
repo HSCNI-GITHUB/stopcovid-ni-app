@@ -1,59 +1,66 @@
-import React, {useRef, useEffect} from 'react';
-import {StyleSheet, Animated, View} from 'react-native';
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
 import colors from '../../constants/colors';
 
 interface ProgressBarProps {
   style?: any;
   sections: number;
   activeSection: number;
+  dark: boolean;
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
+  dark,
   style,
   sections = 1,
   activeSection = 1
-}) => {
-  const width = useRef(new Animated.Value((100 / sections) * activeSection))
-    .current;
-  useEffect(() => {
-    const newWidth = (100 / sections) * activeSection;
-    Animated.timing(width, {
-      toValue: newWidth,
-      duration: 200,
-      useNativeDriver: false
-    }).start();
-  }, [activeSection, sections, width]);
-
-  return (
-    <View style={[styles.container, style]}>
-      <Animated.View
+}) => (
+  <View style={[styles.container, style]}>
+    {Array.from(Array(sections)).map((section, i) => (
+      <View
+        key={`${section}-${i}`}
         style={[
-          styles.bar,
-          {
-            width: width.interpolate({
-              inputRange: [0, 100],
-              outputRange: ['0%', '100%']
-            })
-          }
+          styles.dot,
+          i === 0 && styles.dotFirst,
+          i < activeSection
+            ? dark
+              ? styles.dark
+              : styles.dotActive
+            : dark
+            ? styles.darkDotInactive
+            : styles.dotInactive
         ]}
       />
-    </View>
-  );
-};
+    ))}
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    height: 4,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 1
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
-  bar: {
-    height: 4,
-    borderRadius: 1,
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    marginLeft: 12.5
+  },
+  dotFirst: {
+    marginLeft: 0
+  },
+  dotActive: {
     backgroundColor: colors.white
+  },
+  dotInactive: {
+    backgroundColor: 'rgba(255,255,255,0.1)'
+  },
+  darkDotInactive: {
+    backgroundColor: 'rgba(0, 0, 0, 0.1)'
+  },
+  dark: {
+    backgroundColor: colors.darkerGrey
   }
 });
 

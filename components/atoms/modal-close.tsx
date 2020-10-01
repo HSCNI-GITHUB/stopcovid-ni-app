@@ -25,7 +25,6 @@ export const ModalClose: FC<ModalCloseProps> = ({
       <Image
         source={CloseIcon}
         accessibilityIgnoresInvertColors={false}
-        accessibilityLabel={t('common:close:label')}
         accessibilityHint={
           notification
             ? t('common:close:notification:hint')

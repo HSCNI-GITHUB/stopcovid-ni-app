@@ -4,6 +4,7 @@ import getTextStyles from './text';
 import {getBaseStyles} from './base-styles';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+export const SCREEN_WIDTH = Dimensions.get('window').width;
 const REF_HEIGHT = 667;
 
 const text = getTextStyles(scale);

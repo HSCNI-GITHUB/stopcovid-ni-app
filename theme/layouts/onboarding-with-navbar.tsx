@@ -10,9 +10,12 @@ interface OnboardingWithNavbarProps {
   goBack(): void;
   canGoBack: boolean;
   activeSection: number;
+  hideProgress?: boolean;
+  backgroundColor?: string;
   scrollableStyle?: ViewStyle;
   contentContainerStyle?: ViewStyle;
   scrollViewRef?: MutableRefObject<ScrollView | null>;
+  darkNavbar: boolean;
 }
 
 const OnboardingWithNavbar: FC<OnboardingWithNavbarProps> = ({
@@ -20,21 +23,30 @@ const OnboardingWithNavbar: FC<OnboardingWithNavbarProps> = ({
   goBack,
   children,
   activeSection,
+  hideProgress = false,
+  backgroundColor,
   contentContainerStyle,
   scrollableStyle,
-  scrollViewRef
+  scrollViewRef,
+  darkNavbar
 }) => (
-  <View style={[styles.container]}>
-    <NavBar
-      canGoBack={canGoBack}
-      goBack={goBack}
-      sections={ONBOARDING_STEPS}
-      activeSection={activeSection}
-    />
+  <View
+    style={[
+      styles.container,
+      {backgroundColor: backgroundColor || colors.darkerGrey}
+    ]}>
+    {!hideProgress && (
+      <NavBar
+        canGoBack={canGoBack}
+        goBack={goBack}
+        sections={ONBOARDING_STEPS}
+        activeSection={activeSection}
+        dark={darkNavbar}
+      />
+    )}
     <Scrollable
       scrollableStyle={scrollableStyle}
       scrollViewRef={scrollViewRef}
-      backgroundColor={colors.darkerGrey}
       contentContainerStyle={contentContainerStyle}>
       {children}
     </Scrollable>

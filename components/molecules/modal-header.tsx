@@ -6,7 +6,8 @@ import {
   Image,
   TouchableWithoutFeedback,
   findNodeHandle,
-  AccessibilityInfo
+  AccessibilityInfo,
+  AccessibilityProps
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useIsFocused, useFocusEffect} from '@react-navigation/native';
@@ -19,7 +20,7 @@ import {Back} from '../atoms/back';
 import colors from '../../constants/colors';
 import {useApplication} from '../../providers/context';
 
-interface ModalHeader {
+interface ModalHeader extends Partial<AccessibilityProps> {
   icon?: any;
   heading?: string;
   color?: string;
@@ -27,6 +28,7 @@ interface ModalHeader {
   type?: 'default' | 'inline';
   left?: boolean;
   action?: () => void;
+  input?: boolean;
 }
 
 export const ModalHeader: FC<ModalHeader> = ({
@@ -36,7 +38,9 @@ export const ModalHeader: FC<ModalHeader> = ({
   color,
   back = false,
   left = false,
-  action
+  action,
+  input = false,
+  accessibilityHint
 }) => {
   const {t} = useTranslation();
   const focusStart = useRef<any>();
@@ -58,7 +62,7 @@ export const ModalHeader: FC<ModalHeader> = ({
   useFocusEffect(() => {
     if (screenReaderEnabled && isFocused && focusStart.current) {
       const tag = findNodeHandle(focusStart.current);
-      if (tag) {
+      if (tag && !input) {
         setTimeout(() => AccessibilityInfo.setAccessibilityFocus(tag), 200);
       }
     }
@@ -114,6 +118,7 @@ export const ModalHeader: FC<ModalHeader> = ({
                   ref={focusStart}
                   style={[
                     styles.heading,
+                    left && styles.leftHeading,
                     color ? {color} : {},
                     !back && !icon ? styles.marginTop : {}
                   ]}>
@@ -123,9 +128,11 @@ export const ModalHeader: FC<ModalHeader> = ({
             )}
             {!action && heading && (
               <Text
+                accessibilityHint={accessibilityHint}
                 ref={focusStart}
                 style={[
                   styles.heading,
+                  left && styles.leftHeading,
                   color ? {color} : {},
                   !back && !icon ? styles.marginTop : {}
                 ]}>
@@ -176,6 +183,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexWrap: 'wrap'
   },
+  leftHeading: {
+    textAlign: 'left'
+  },
   header: {
     alignItems: 'center'
   },
@@ -192,11 +202,8 @@ const styles = StyleSheet.create({
     marginRight: 15
   },
   title: {
-    ...text.medium,
-    fontWeight: 'bold',
-    color: colors.darkerGrey,
-    flex: 1,
-    flexWrap: 'wrap'
+    ...text.smallBold,
+    color: colors.black
   },
   left: {
     textAlign: 'left',

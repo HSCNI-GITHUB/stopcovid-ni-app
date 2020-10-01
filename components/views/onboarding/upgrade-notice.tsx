@@ -1,11 +1,12 @@
 import React, {FC} from 'react';
 import {Text, StyleSheet, View, Linking, Platform} from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {useExposure} from '@nearform/react-native-exposure-notification-service';
+import {useExposure} from 'react-native-exposure-notification-service';
 
 import Button from '../../atoms/button';
-import {text} from '../../../theme';
+import {text, scale} from '../../../theme';
 import Spacing from '../../atoms/spacing';
+import {Content} from './common';
 
 interface UpgradeNoticeProps {}
 
@@ -30,7 +31,11 @@ const UpgradeNotice: FC<UpgradeNoticeProps> = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.top}>
+      <Content>
+        <Text style={styles.title}>
+          {t(`onboarding:upgradeNotice:${platform}:title`)}
+        </Text>
+        <Spacing s={24} />
         <Text style={styles.moreText}>
           {t(`onboarding:upgradeNotice:${platform}:text1`)}
         </Text>
@@ -38,11 +43,9 @@ const UpgradeNotice: FC<UpgradeNoticeProps> = () => {
         <Text style={[styles.moreText, styles.bold]}>
           {t('onboarding:upgradeNotice:text2')}
         </Text>
-        <Spacing s={24} />
-      </View>
-      <View>
+        <Spacing s={36} />
         <Button
-          type="default"
+          variant="small"
           onPress={checkForUpgradeHandler}
           hint={t(
             `onboarding:upgradeNotice:accessibility:${platform}:upgradeHint`
@@ -50,14 +53,17 @@ const UpgradeNotice: FC<UpgradeNoticeProps> = () => {
           label={t(`onboarding:upgradeNotice:${platform}:btnLabel`)}>
           {t(`onboarding:upgradeNotice:${platform}:btnLabel`)}
         </Button>
-      </View>
+      </Content>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flexGrow: 1},
-  top: {flex: 1},
+  container: {flex: 1, paddingTop: 160},
+  title: {
+    ...text.mediumBold,
+    fontSize: scale(25)
+  },
   viewText: {
     ...text.medium
   },
@@ -65,7 +71,7 @@ const styles = StyleSheet.create({
     ...text.small
   },
   bold: {
-    fontWeight: 'bold'
+    ...text.defaultBold
   }
 });
 

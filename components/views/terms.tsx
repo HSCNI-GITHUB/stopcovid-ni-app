@@ -1,5 +1,6 @@
-import React, {FC} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {StyleSheet, ScrollView, View, Platform} from 'react-native';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import {useApplication} from '../../providers/context';
 import {Title} from '../atoms/title';
@@ -9,70 +10,103 @@ import {useSettings} from '../../providers/settings';
 import Markdown from '../atoms/markdown';
 import {text} from '../../theme';
 import Spacing from '../atoms/spacing';
+import colors from '../../constants/colors';
 
 export const Terms: FC = () => {
   const {user} = useApplication();
   const {tandcText} = useSettings();
+  const [initialRender, setInitialRender] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setInitialRender(false);
+  }, []);
+  useEffect(() => {
+    if (!initialRender) {
+      setLoading(false);
+    }
+  }, [initialRender]);
+
   return (
-    <ScrollView style={styles.container}>
-      {user && <Back />}
-      {!user && (
-        <View style={styles.modalClose}>
-          <ModalClose />
-        </View>
-      )}
-      <Title title="terms:title" />
-      <View>
-        <Markdown markdownStyles={markdownStyles}>{tandcText}</Markdown>
-      </View>
-      <Spacing s={100} />
-    </ScrollView>
+    <>
+      <ScrollView style={styles.container}>
+        {user && <Back />}
+        {!user && (
+          <View style={styles.modalClose}>
+            <ModalClose />
+          </View>
+        )}
+        <Title title="terms:title" />
+        {!loading && (
+          <View>
+            <Markdown markdownStyles={markdownStyles}>{tandcText}</Markdown>
+          </View>
+        )}
+        <Spacing s={100} />
+        {loading && (
+          <Spinner
+            animation="fade"
+            visible
+            overlayColor={'rgba(0, 0, 0, 0.5)'}
+          />
+        )}
+      </ScrollView>
+    </>
   );
 };
 
 export const markdownStyles = StyleSheet.create({
   text: {
-    ...text.default,
-    lineHeight: 25
+    ...text.largeBody,
+    color: colors.black
   },
   h1: {
-    ...text.heading,
-    marginBottom: 20
+    ...text.largeBody,
+    marginVertical: 20
   },
   h2: {
-    ...text.heading,
-    marginBottom: 20
+    ...text.largeBody,
+    marginVertical: 20
   },
   h3: {
-    ...text.heading,
-    marginBottom: 20
+    ...text.largeBody,
+    marginVertical: 20
   },
   h4: {
-    ...text.heading,
-    marginBottom: 20
+    ...text.largeBody,
+    marginVertical: 20
   },
   h5: {
-    ...text.heading,
-    marginBottom: 20
+    ...text.largeBody,
+    marginVertical: 20
   },
   h6: {
-    ...text.heading,
-    marginBottom: 20
+    ...text.largeBody,
+    marginVertical: 20
   },
   // @ts-ignore
   strong: {
     ...text.defaultBold
   },
   list: {
-    marginBottom: 20
+    marginVertical: 20
   },
   listItemContent: {
     ...text.default,
+    flexDirection: 'row',
+    flexShrink: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
     marginBottom: 20
   },
   listItemBullet: {
     ...text.default,
-    marginRight: 10
+    width: 4,
+    height: 4,
+    backgroundColor: 'black',
+    borderRadius: 2,
+    marginRight: 10,
+    marginTop: 12
   },
   listItemNumber: {
     ...text.default,
@@ -94,5 +128,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
     marginBottom: 44
+  },
+  accessibilityView: {
+    ...StyleSheet.absoluteFillObject
   }
 });

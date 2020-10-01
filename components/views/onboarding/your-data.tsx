@@ -1,95 +1,79 @@
 import React, {FC} from 'react';
-import {StyleSheet, View, Image} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 import Button from '../../atoms/button';
 import Spacing from '../../atoms/spacing';
-import {text} from '../../../theme';
+import Illustration from '../../atoms/illustration';
 import Markdown from '../../atoms/markdown';
-import colors from '../../../constants/colors';
+import {Content, Title} from './common';
+import {text} from '../../../theme';
+import {ScreenNames} from '../../../navigation';
 
-const IconBell = require('../../../assets/images/icon-bell/icon-bell.png');
-const IconUnion = require('../../../assets/images/icon-union/icon-union.png');
+const IllustrationSource = require('../../../assets/images/close-contact-illustration/image.png');
 
 interface YourDataProps {
   handleNext(): void;
+  navigation: StackNavigationProp<any>;
 }
 
-const YourData: FC<YourDataProps> = ({handleNext}) => {
+const YourData: FC<YourDataProps> = ({handleNext, navigation}) => {
   const {t} = useTranslation();
+
   return (
     <>
-      <View style={styles.column}>
-        <View style={styles.row}>
-          <View style={styles.iconWrapper}>
-            <Image
-              resizeMethod="resize"
-              resizeMode="contain"
-              source={IconBell}
-              accessibilityIgnoresInvertColors={false}
-            />
-          </View>
-          <View style={styles.column}>
-            <Markdown markdownStyles={markdownStyles}>
-              {t('onboarding:yourData:view:textBell')}
-            </Markdown>
-          </View>
-        </View>
+      <View style={styles.container}>
+        <Illustration
+          source={IllustrationSource}
+          accessibilityHint={t(
+            'onboarding:yourData:accessibility:illustrationAlt'
+          )}
+        />
         <Spacing s={24} />
-        <View style={styles.row}>
-          <View style={styles.iconWrapper}>
-            <Image
-              resizeMethod="resize"
-              resizeMode="contain"
-              source={IconUnion}
-              accessibilityIgnoresInvertColors={false}
-            />
-          </View>
-          <View style={styles.column}>
-            <Markdown markdownStyles={markdownStyles}>
-              {t('onboarding:yourData:view:textUnion')}
-            </Markdown>
-          </View>
-        </View>
+        <Title>{t('onboarding:yourData:view:title')}</Title>
+        <Spacing s={24} />
+        <Content>
+          <Markdown markdownStyles={markdownStyles}>
+            {t('onboarding:yourData:view:text')}
+          </Markdown>
+        </Content>
       </View>
-      <Spacing s={24} />
-      <View>
+      <Content>
+        <Spacing s={24} />
         <Button
-          type="default"
+          variant="small"
+          type="secondary"
+          onPress={() => navigation.navigate(ScreenNames.yourDataModal)}
+          hint={t('onboarding:yourData:accessibility:howWorksHint')}
+          label={t('onboarding:yourData:accessibility:howWorksLabel')}>
+          {t('onboarding:yourData:accessibility:howWorksLabel')}
+        </Button>
+        <Spacing s={10} />
+        <Button
+          variant="small"
           onPress={handleNext}
           hint={t('onboarding:yourData:accessibility:nextHint')}
           label={t('onboarding:yourData:accessibility:nextLabel')}>
           {t('common:next:label')}
         </Button>
-      </View>
-      <Spacing s={50} />
+        <Spacing s={50} />
+      </Content>
     </>
   );
 };
 
 const markdownStyles = StyleSheet.create({
   text: {
-    fontSize: 15,
-    lineHeight: 25,
-    color: colors.white
+    ...text.small
+  },
+  strong: {
+    ...text.smallBold
   }
 });
 
 const styles = StyleSheet.create({
-  underline: {textDecorationLine: 'underline'},
-  column: {flex: 1, flexDirection: 'column'},
-  row: {flexDirection: 'row'},
-  iconWrapper: {width: 80, paddingLeft: 15, paddingTop: 7},
-  viewText: {
-    ...text.medium,
-    color: colors.white
-  },
-  moreText: {
-    ...text.small
-  },
-  termsLink: {
-    color: colors.white
-  }
+  container: {flex: 1}
 });
 
 export default YourData;

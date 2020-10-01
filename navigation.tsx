@@ -9,6 +9,7 @@ export enum ScreenNames {
   dashboard = 'dashboard',
   ageConfirmation = 'ageConfirmation',
   locationConfirmation = 'locationConfirmation',
+  ageSorting = 'ageSorting',
   tracing = 'tracing',
   about = 'about',
   community = 'community',
@@ -22,5 +23,10 @@ export enum ScreenNames {
   dataPolicy = 'dataPolicy',
   usage = 'usage',
   leave = 'leave',
-  debug = 'debug'
+  debug = 'debug',
+  askPermissions = 'permissions-info',
+  pause = 'pause',
+  yourDataModal = 'yourDataModal',
+  testResultModal = 'testResultModal',
+  privacyModal = 'privacyModal'
 }
